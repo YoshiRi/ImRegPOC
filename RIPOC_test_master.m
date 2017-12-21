@@ -4,10 +4,10 @@
 % output : translation , rotation , scaling
 
 
-%% ‰æ‘œ“ü—Í
+%% ï¿½æ‘œï¿½ï¿½ï¿½ï¿½
 AI = rgb2gray(imread('luna1_1.png'));
 
-%% ƒTƒCƒYŒˆ’è
+%% ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½ï¿½
 [height, width ] = size(AI);
  cy = height/2;
  cx = width/2;
@@ -19,7 +19,7 @@ BI = ImageRotateScale(BI,-100,1.2,height,width);
 
 
 
-%% ‘‹ŠÖ”‚Ì€”õ i‰æ‘œ’[‚Ì‰e‹¿‚ğ”ğ‚¯‚é‚½‚ßj
+%% ï¿½ï¿½ï¿½Öï¿½ï¿½Ìï¿½ï¿½ï¿½ ï¿½iï¿½æ‘œï¿½[ï¿½Ì‰eï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ßj
 % hannig window and root of hanning window
 han_win = zeros(width);
 Rhan_win = zeros(width);
@@ -35,12 +35,12 @@ end
 
 
 
-%% ‘‹ŠÖ”iƒtƒBƒ‹ƒ^j‚ğŠ|‚¯‚é(convolute window) 
+%% ï¿½ï¿½ï¿½Öï¿½ï¿½iï¿½tï¿½Bï¿½ï¿½ï¿½^ï¿½jï¿½ï¿½|ï¿½ï¿½ï¿½ï¿½(convolute window) 
 % IA = Rhan_win .* double(rgb2gray(AI));
 IA = Rhan_win .* double((AI));
 IB = Rhan_win .* double(BI);
  
-%%Ø‚èo‚µ
+%%ï¿½Ø‚ï¿½oï¿½ï¿½
 % IA = imcrop(AI,[ cx-width/2,cy-height/2,width-1,height-1]);
 % IB = imcrop(BI,[ cx-width/2,cy-height/2,width-1,height-1]); 
 
@@ -52,11 +52,15 @@ B=fft2(IB);
 At = A./abs(A);
 Bt = (conj(B))./abs(B);
 
-%% U•¬•ª‚Ì’Šo@•@‘Î”‰»
+%% ï¿½Uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì’ï¿½ï¿½oï¿½@ï¿½ï¿½ï¿½@ï¿½Îï¿½ï¿½ï¿½
 % As=cut_win .* fftshift(log(abs(A)+1));
 % Bs=cut_win .* fftshift(log(abs(B)+1));
 As= fftshift(log(abs(A)+1));
 Bs= fftshift(log(abs(B)+1));
+
+
+
+
 
 %% Log-Poler Transformation
 % need bilinear interpolation
@@ -92,7 +96,7 @@ for i= 0:width-1
             w1=x-x0;
             h0=y1-y;
             h1=y-y0;
-            %@Bilinear•âŠ®
+            %ï¿½@Bilinearï¿½âŠ®
             val=As(y0+1,x0+1)*w0*h0 + As(y0+1,x1+1)*w1*h0+ As(y1+1,x0+1)*w0*h1 + As(y1+1,x1+1)*w1*h1;
             lpcA(j+1,i+1)=val;
             val=Bs(y0+1,x0+1)*w0*h0 + Bs(y0+1,x1+1)*w1*h0+ Bs(y1+1,x0+1)*w0*h1 + Bs(y1+1,x1+1)*w1*h1;
@@ -116,7 +120,7 @@ Pp = fftshift(ifft2(Ap.*Bp));
 px=y;
 py=x(y);
 
-%% Bilinear•âŠÔ
+%% Bilinearï¿½ï¿½ï¿½
 sum = Pp(py-1,px-1)+Pp(py,px-1)+Pp(py+1,px-1)+Pp(py-1,px)+Pp(py,px)+Pp(py+1,px)+Pp(py-1,px+1)+Pp(py,px+1)+Pp(py+1,px+1);
 
 pxx = ( Pp(py-1,px-1)+Pp(py,px-1)+Pp(py+1,px-1) ) * (px-1) + ( Pp(py-1,px)+Pp(py,px)+Pp(py+1,px) ) * px + ( Pp(py-1,px+1)+Pp(py,px+1)+Pp(py+1,px+1) )* (px+1);
@@ -129,11 +133,11 @@ dx = width/2 - pxx + 1;
 dy = height/2 - pyy + 1;
 
 
-%% Scale—Ê‚Ì•â³
+%% Scaleï¿½Ê‚Ì•â³
 dx = dx/M;
 
 
-%% ‰ñ“]—Ê‚É‚Í2‚Â‚Ìƒs[ƒN‚ªoŒ»‚·‚é
+%% ï¿½ï¿½]ï¿½Ê‚É‚ï¿½2ï¿½Â‚Ìƒsï¿½[ï¿½Nï¿½ï¿½ï¿½oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 theta1 = 360 * dy / height;
 theta2 = theta1 + 180;
 scale = power(width,dx/width)
@@ -143,12 +147,12 @@ ylabel('rotation axis')
 xlabel('scaling axis')
 zlabel('correlation value')
 
-%% ‰ñ“]EŠg‘åk¬—Ê ‚ğ•â³
-% –Ê“|‚¾‚ªŠp“x‚É‚Í2‚Â‚Ìƒpƒ^[ƒ“‚ª‚ ‚éc
+%% ï¿½ï¿½]ï¿½Eï¿½gï¿½ï¿½kï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½â³
+% ï¿½Ê“|ï¿½ï¿½ï¿½ï¿½ï¿½pï¿½xï¿½É‚ï¿½2ï¿½Â‚Ìƒpï¿½^ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½c
 IB_recover1 = ImageRotateScale(IB, theta1,1/scale,width,height);
 IB_recover2 = ImageRotateScale(IB, theta2,1/scale,width,height);
 
-%% •½sˆÚ“®—ÊŒŸo • ‰ñ“]—ÊŒˆ’è
+%% ï¿½ï¿½ï¿½sï¿½Ú“ï¿½ï¿½ÊŒï¿½ï¿½o ï¿½ï¿½ ï¿½ï¿½]ï¿½ÊŒï¿½ï¿½ï¿½
 
 IB_R1=fft2(IB_recover1);
 IB_R2=fft2(IB_recover2);
@@ -169,7 +173,7 @@ py1=x1(y1);
 px2=y2;
 py2=x2(y2);
 
-%% 2í—Ş‚Ì‰ñ“]—Ê‚É‚Â‚¢‚ÄPOC‚ğs‚¢Cƒs[ƒN‚ªo‚é•ûC’l‚ª‘å‚«‚¢‚Ù‚¤‚ğ^’l‚Æ‚·‚é
+%% 2ï¿½ï¿½Ş‚Ì‰ï¿½]ï¿½Ê‚É‚Â‚ï¿½ï¿½ï¿½POCï¿½ï¿½sï¿½ï¿½ï¿½Cï¿½sï¿½[ï¿½Nï¿½ï¿½ï¿½oï¿½ï¿½ï¿½ï¿½Cï¿½lï¿½ï¿½ï¿½å‚«ï¿½ï¿½ï¿½Ù‚ï¿½ï¿½ï¿½^ï¿½lï¿½Æ‚ï¿½ï¿½ï¿½
 if mx1 > mx2
 theta = theta1
 % bilinear
