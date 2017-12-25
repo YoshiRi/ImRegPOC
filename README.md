@@ -5,13 +5,18 @@ If you used this programs, please cite our paper below:
 
 
 ## 1. Phase-Correlation based Translation Estimate (POC)
-Fundamental Equation:
+Image translation can be detected with the cross correlation of 2D FFT spectrum of spacial frequency.
+
 $$
-R = \dfrac{AB}{|AB|}
+ R(k_1,k_2)=\frac{F(k_1,k_2)\overline{G(k_1,k_2)}}{|F(k_1,k_2)\overline{G(k_1,k_2)}|}
 $$
 
 ## 2. Phase-Correlation based Rotation and Scaling Estimate (RIPOC)
+Using log-polar trasformation, rotation and scaling can also detected with phase correlation technique.
 
+$$
+	(\delta_x,\delta_y)=(N\theta/\pi,-N\log_N \kappa)
+$$
 
 ## Other related links
 
