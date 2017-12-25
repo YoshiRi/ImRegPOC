@@ -5,7 +5,7 @@
 __author__ = "Yoshi Ri"
 __copyright__ = "Copyright 2017, The University of Tokyo"
 __credits__ = ["Yoshi Ri"]
-__license__ = "GPL"
+__license__ = "MIT"
 __version__ = "1.0.1"
 __maintainer__ = "Yoshi Ri"
 __email__ = "yoshiyoshidetteiu@gmail.com"
