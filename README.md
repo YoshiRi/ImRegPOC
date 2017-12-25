@@ -8,14 +8,19 @@ If you used this programs, please cite our paper below:
 Image translation can be detected with the cross correlation of 2D FFT spectrum of spacial frequency.
 
 $$
+\begin{eqnarray}
  R(k_1,k_2)=\frac{F(k_1,k_2)\overline{G(k_1,k_2)}}{|F(k_1,k_2)\overline{G(k_1,k_2)}|}
+\end{eqnarray}
 $$
 
 ## 2. Phase-Correlation based Rotation and Scaling Estimate (RIPOC)
 Using log-polar trasformation, rotation and scaling can also detected with phase correlation technique.
 
+
 $$
+\begin{eqnarray}
 	(\delta_x,\delta_y)=(N\theta/\pi,-N\log_N \kappa)
+\end{eqnarray}
 $$
 
 ## Other related links
