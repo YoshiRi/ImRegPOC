@@ -3,9 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt # matplotlibの描画系
 import math
 
-# Faster and Lighter Phase Correlation Function
-
-# For only Translation
+# Get peak point
 def CenterOfGravity(mat):
     hei,wid = mat.shape
     Tile=np.arange(wid,dtype=float)-(wid-1.0)/2.0
