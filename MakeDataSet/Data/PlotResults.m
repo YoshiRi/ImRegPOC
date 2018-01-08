@@ -17,7 +17,7 @@ abserr = abs(err./gt);
 
 t = 1:size(gt,1);
 
-set(0,'defaultfigureposition',[-30000 0 300 300]')
+set(0,'defaultfigureposition',[0 -3000 300 300]')
 figure(1)
 plot(t,abserr,t,pocpeak,'r--')
 ylim([0 1])

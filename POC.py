@@ -68,9 +68,9 @@ def POC(a,b):
         theta = -theta2
 
     if theta > 180:
-        theta -= 180
+        theta -= 360
     elif theta < -180:
-        theta += 180
+        theta += 360
 
 
     # Imshow
