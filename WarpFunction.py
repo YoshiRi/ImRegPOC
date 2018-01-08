@@ -19,7 +19,7 @@ def poc2warp(cx,cy,dx,dy,theta,scale):
 def Warp_4dof(Img,dx,dy,theta,scale):
     rows,cols = Img.shape
     cy, cx = rows/2.0 ,cols/2.0
-    poc2warp(cy,cx,dx,dy,theta,scale)
+    Affine = poc2warp(cy,cx,dx,dy,theta,scale)
     outImg = cv2.warpPerspective(Img, Affine, (cols,rows), cv2.INTER_LINEAR)
     return outImg
 

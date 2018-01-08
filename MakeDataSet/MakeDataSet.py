@@ -33,7 +33,7 @@ def MakeDataSet(filename,nS=256):
     A_ref = poc2warp(cx,cy,0,0,0,1)
     Iref = cv2.warpPerspective(Temp,A_ref,(wid,hei))
     cIref=cropCenter(Iref,[nS,nS])
-    cv2.imwrite('Data/test1ref1.png',cIref)
+    cv2.imwrite('Data/test1ref.png',cIref)
 
     # Save Transfered Image
     iterate = 1

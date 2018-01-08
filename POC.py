@@ -28,8 +28,10 @@ def POC(a,b):
     
     # 1.2: Filtering
     lpmin_tuning = 1/2.0 # tuning parameter
+    lpmax_tuning = 0.8
     LPmin = math.floor(Mag*math.log(lpmin_tuning*width/2.0/math.pi))
-    LPmax = math.floor(Mag*math.log(width/2))-20
+    LPmax = math.floor(Mag*math.log(width*lpmax_tuning/2))
+    assert LPmax > LPmin, 'Invalid condition!\n Enlarge lpmax tuning parameter or lpmin_tuning parameter'
     Tile = np.repeat([0.0,1.0,0.0],[LPmin-1,LPmax-LPmin+1,width-LPmax])
     Mask = np.tile(Tile,[height,1])
     LPA_filt = LPA*Mask
@@ -64,7 +66,13 @@ def POC(a,b):
         Trans = diff2
         peak = peak2
         theta = -theta2
+
+    if theta > 180:
+        theta -= 180
+    else if theta < -180:
+        theta += 180
         
+
     # Imshow
     plt.subplot(5,2,1)
     plt.imshow(LA,vmin=LA.min(), vmax=LA.max())
