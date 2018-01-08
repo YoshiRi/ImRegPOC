@@ -69,9 +69,9 @@ def POC(a,b):
 
     if theta > 180:
         theta -= 180
-    else if theta < -180:
+    elif theta < -180:
         theta += 180
-        
+
 
     # Imshow
     plt.subplot(5,2,1)
