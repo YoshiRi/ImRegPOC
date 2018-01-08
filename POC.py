@@ -8,6 +8,8 @@ from WarpFunction import *
 
 def POC(a,b):
     imshowflag = 1 # show the processing image
+    a = a.astype(np.float32)
+    b = b.astype(np.float32)
     height,width = a.shape
     hann = cv2.createHanningWindow((height, width),cv2.CV_64F)
     rhann = np.sqrt(hann)
