@@ -83,4 +83,4 @@ def POC(a,b):
     plt.subplot(5,2,8)
     plt.imshow(b2, vmin=b2.min(), vmax=b2.max(),cmap="gray")
 
-    return [Trans[0],Trans[1],theta,1/invscale]
+    return [Trans[0],Trans[1],theta,1/invscale] , peak
