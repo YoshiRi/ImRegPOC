@@ -1,9 +1,26 @@
-# Phase-Correlation program for matlab and Python
+# Robust FFT-Based Image Registration Tools for Python
+This program provides robust image registration method using "Phase Correlation" technique.
+
+With this toolbox, you can estimate 
+Translation, Rotation and Scaling between two images.
+
+Output form is supported: Affine Matrix, each parameter
 If you used this programs, please cite our paper below:
 
 >  Y. Ri, H. Hiroshi Fujimoto. : \`\`Practical Phase-Only Correlation Algorithm for Robust and Accurate Image Sencing'', <i> Now Under Review </i> Vol. X, pp.XX. (20XX) 
 
+## Getting started 
 
+
+### Prerequirements
+
+### Instaling
+
+
+## Running the tests
+
+
+# Short description
 ## 1. Phase-Correlation based Translation Estimate (POC)
 Image translation can be detected with the cross correlation of 2D FFT spectrum of spacial frequency.
 

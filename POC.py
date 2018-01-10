@@ -16,19 +16,23 @@ def POC(a,b):
     # Windowing and FFT
     G_a = np.fft.fft2(a*rhann)
     G_b = np.fft.fft2(b*rhann)
+
     # 1. Get Rotation and Scaling Error
+    # 1.1: Frequency Whitening  
     LA = np.fft.fftshift(np.log(np.absolute(G_a)+1))
     LB = np.fft.fftshift(np.log(np.absolute(G_b)+1))
-    # 1.1: Log polar
+    # 1.2: Log polar
     cx = width / 2
     cy = height / 2
     Mag = width/math.log(width)
     LPA = cv2.logPolar(LA, (cy, cx), Mag, cv2.INTER_LINEAR)
     LPB = cv2.logPolar(LB, (cy, cx), Mag, cv2.INTER_LINEAR)
     
-    # 1.2: Filtering
-    lpmin_tuning = 1/2.0 # tuning parameter
-    lpmax_tuning = 0.8
+    # 1.3: Filtering
+    # --------------- Tuning parameter ----------------
+    lpmin_tuning = 1/2.0 # default 1/2
+    lpmax_tuning = 0.8   # default 0.8
+    # -------------------------------------------------
     LPmin = math.floor(Mag*math.log(lpmin_tuning*width/2.0/math.pi))
     LPmax = math.floor(Mag*math.log(width*lpmax_tuning/2))
     assert LPmax > LPmin, 'Invalid condition!\n Enlarge lpmax tuning parameter or lpmin_tuning parameter'
@@ -37,14 +41,14 @@ def POC(a,b):
     LPA_filt = LPA*Mask
     LPB_filt = LPB*Mask
 
-    # 1.3: Phase Correlate to Get Rotation and Scaling
+    # 1.4: Phase Correlate to Get Rotation and Scaling
     Diff,peak = cv2.phaseCorrelate(LPA_filt,LPB_filt)
     Diff,peak = PhaseCorrelation(LPA_filt,LPB_filt)
     # print('DXDY',Diff,'peak',peak)
     
     #  Final output of scale and rotation
     theta1 = 360 * Diff[1] / height; # deg
-    theta2 = theta1 + 180; # deg
+    theta2 = theta1 + 180; # deg theta ambiguity
     invscale = math.pow(float(width),Diff[0]/float(width))
     # print('Theta? ',-theta1,'Scale ',1/invscale)
     

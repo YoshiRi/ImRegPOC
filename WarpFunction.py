@@ -29,7 +29,7 @@ def affine2poc(Affine):
     scale = math.sqrt(np.sum(A2[0:2,0:2])/2.0)
     theta = math.atan2(Affine[1],Affine[0])
 
-    Trans = np.dot(Affine[0:2,0:2].inv,Affine[1:3,2:3])
+    Trans = np.dot(np.linalg.inv(Affine[0:2,0:2]),Affine[1:3,2:3])
     return [Trans[0],Trans[1],theta,scale]
 
 def MoveCenterOfImage(Affine,now,moved):

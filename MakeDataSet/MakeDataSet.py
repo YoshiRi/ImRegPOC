@@ -1,4 +1,3 @@
-
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt # matplotlibの描画系
@@ -21,10 +20,11 @@ def cropCenter(Img,Size):
     return Img[cy-sy:cy+sy,cx-sx:cx+sx]
 
 
-def MakeDataSet(filename,nS=256):
+def MakeDataSet(Temp,nS=256, outfolder = 'Data/Test1/'):
     import random
-
-    Temp = cv2.imread(filename,0)
+    import os
+    if not os.path.exists(outfolder):
+        os.makedirs(outfolder)
     # Define size : nS = 256
     hei,wid = Temp.shape
     cy,cx = hei/2 ,wid/2 
@@ -33,14 +33,14 @@ def MakeDataSet(filename,nS=256):
     A_ref = poc2warp(cx,cy,0,0,0,1)
     Iref = cv2.warpPerspective(Temp,A_ref,(wid,hei))
     cIref=cropCenter(Iref,[nS,nS])
-    cv2.imwrite('Data/test1ref.png',cIref)
+    cv2.imwrite(outfolder+'ref.png',cIref)
 
     # Save Transfered Image
     iterate = 1
     dataset = []
     DataNum = 50
     for iterate in range(1,DataNum+1):
-        outname = 'Data/test1cmp' + str(iterate) + '.png'
+        outname = outfolder +'cmp' + str(iterate) + '.png'
         rdx = random.randint(-nS/4,nS/4)
         rdy = random.randint(-nS/4,nS/4)
         rCta = random.uniform(-math.pi,math.pi)
@@ -54,7 +54,7 @@ def MakeDataSet(filename,nS=256):
         # Save template in Txt
         dataset.append([rdx,rdy,rCta*180/math.pi,rS])
     dataset = np.array(dataset,np.float32).reshape(DataNum,4)
-    np.savetxt('Data/test1TrueParam.csv',dataset,delimiter=',')
+    np.savetxt(outfolder+'TrueParam.csv',dataset,delimiter=',')
 
 def GetFileName():
     # Import module
@@ -71,4 +71,9 @@ def GetFileName():
 
 if __name__ == '__main__':
     filename = GetFileName()
-    MakeDataSet(filename)
+    Temp = cv2.imread(filename,0)
+    print('Original Image Size is...')
+    print(Temp.shape)
+    
+    foldname = input('Folder Name? : ')
+    MakeDataSet(Temp,256,'Data/'+foldname+'/')
