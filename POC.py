@@ -76,23 +76,23 @@ def POC(a,b):
     elif theta < -180:
         theta += 360
 
-
-    # Imshow
-    plt.subplot(5,2,1)
-    plt.imshow(LA,vmin=LA.min(), vmax=LA.max())
-    plt.subplot(5,2,2)
-    plt.imshow(LB,vmin=LB.min(), vmax=LB.max())
-    plt.subplot(5,2,3)
-    plt.imshow(LPA,vmin=LPA.min(), vmax=LPA.max(),cmap="gray")
-    plt.subplot(5,2,4)
-    plt.imshow(LPB, vmin=LPB.min(), vmax=LPB.max(),cmap="gray")
-    plt.subplot(5,2,5)
-    plt.imshow(LPA_filt,vmin=LPA_filt.min(), vmax=LPA_filt.max(),cmap="gray")
-    plt.subplot(5,2,6)
-    plt.imshow(LPB_filt, vmin=LPB_filt.min(), vmax=LPB_filt.max(),cmap="gray")
-    plt.subplot(5,2,7)
-    plt.imshow(b1,vmin=b1.min(), vmax=b1.max(),cmap="gray")
-    plt.subplot(5,2,8)
-    plt.imshow(b2, vmin=b2.min(), vmax=b2.max(),cmap="gray")
+    if 0:
+        # Imshow
+        plt.subplot(5,2,1)
+        plt.imshow(LA,vmin=LA.min(), vmax=LA.max())
+        plt.subplot(5,2,2)
+        plt.imshow(LB,vmin=LB.min(), vmax=LB.max())
+        plt.subplot(5,2,3)
+        plt.imshow(LPA,vmin=LPA.min(), vmax=LPA.max(),cmap="gray")
+        plt.subplot(5,2,4)
+        plt.imshow(LPB, vmin=LPB.min(), vmax=LPB.max(),cmap="gray")
+        plt.subplot(5,2,5)
+        plt.imshow(LPA_filt,vmin=LPA_filt.min(), vmax=LPA_filt.max(),cmap="gray")
+        plt.subplot(5,2,6)
+        plt.imshow(LPB_filt, vmin=LPB_filt.min(), vmax=LPB_filt.max(),cmap="gray")
+        plt.subplot(5,2,7)
+        plt.imshow(b1,vmin=b1.min(), vmax=b1.max(),cmap="gray")
+        plt.subplot(5,2,8)
+        plt.imshow(b2, vmin=b2.min(), vmax=b2.max(),cmap="gray")
 
     return [Trans[0],Trans[1],theta,1/invscale] , peak

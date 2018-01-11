@@ -16,9 +16,12 @@ def CenterOfGravity(mat):
 
 # Weighted Center Of Gravity
 def WeightedCOG(mat):
-    peak = mat.max()
-    newmat = mat*(mat>peak/10)
-    Res = CenterOfGravity(newmat)
+    try:
+        peak = mat.max()
+        newmat = mat*(mat>peak/10)
+        Res = CenterOfGravity(newmat)
+    except:
+        Res = 0
     return Res
 
 # Phase Correlation
