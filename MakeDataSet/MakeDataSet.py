@@ -63,17 +63,26 @@ def GetFileName():
     root = tkinter.Tk()
     root.withdraw()
     # Any file type of Image
-    fTyp = [("",["*.png","*.jpg","*.bmp"])]
+    fTyp = [("",["*.png","*.jpg","*.bmp","*.tif"])]
     iDir = os.path.abspath(os.path.dirname(__file__))
     tkinter.messagebox.showinfo('Image choice','Choose Base Image!')
     file = tkinter.filedialog.askopenfilename(filetypes = fTyp,initialdir = iDir)
     return file
 
 if __name__ == '__main__':
+    import sys
+    args = sys.argv
+    if len(args) == 2:
+        nS = int(args[1])
+    else:
+        nS = 256
+    print('Template Size is '+str(nS))
+
+
     filename = GetFileName()
     Temp = cv2.imread(filename,0)
     print('Original Image Size is...')
     print(Temp.shape)
     
     foldname = input('Folder Name? : ')
-    MakeDataSet(Temp,256,'Data/'+foldname+'/')
+    MakeDataSet(Temp,nS,'Data/'+foldname+'/')

@@ -4,9 +4,13 @@ clear all
 close all
 
 %% LOAD 
-gt = load('TrueParam.csv');
-pocval = load('POCEstimation.csv');
-pocpeak = load('POCpeak.csv');
+
+folder = 'Test4/'
+
+
+gt = load([folder,'TrueParam.csv']);
+pocval = load([folder,'POCEstimation.csv']);
+pocpeak = load([folder,'POCpeak.csv']);
 
 
 t = 1:size(gt,1);
@@ -15,10 +19,12 @@ t = 1:size(gt,1);
 
 err = gt-pocval;
 gtnz = gt;
-gtnz(gt==0) = 0.01
+gtnz(gt==0) = 0.01;
+abserr = abs(err);
 abserrp = abs(err./gtnz);
 
-
+abserr(pocpeak<0.05,:) = 0;
+AvgErr = sum(abserr)/sum(pocpeak>0.05)
 
 % set(0,'defaultfigureposition',[25000 0 300 300]')
 
@@ -33,14 +39,17 @@ grid on
 pfig = pubfig(hfig);
 pfig.LegendLoc = 'best';
 pfig.FigDim = [15 11];
-expfig(['POC_Estimation'],'-pdf');
+% expfig(['POC_Estimation'],'-pdf');
 
 %%  Err for SIFT
-SIFTval = load('SIFTEstimation.csv');
-SIFTeval = load('FPnumSIFT.csv');
+SIFTval = load([folder,'SIFTEstimation.csv']);
+SIFTeval = load([folder,'FPnumSIFT.csv']);
 
 SIFTerr = gt-SIFTval;
 SIFTabserrp = abs(SIFTerr./gtnz);
+SIFTabserr = abs(SIFTerr);
+
+SIFTAvgErr = sum(SIFTabserr)/size(SIFTabserr,1)
 
 hfig = figure(2)
 plot(t,SIFTabserrp)
@@ -75,11 +84,14 @@ pfig.FigDim = [15 11];
 
 %% Eval for ORB
 
-ORBval = load('ORBEstimation.csv');
-ORBeval = load('FPnumORB.csv');
+ORBval = load([folder,'ORBEstimation.csv']);
+ORBeval = load([folder,'FPnumORB.csv']);
 
 ORBerr = gt-ORBval;
 ORBabserrp = abs(ORBerr./gtnz);
+ORBabserr = abs(ORBerr);
+
+ORBAvgErr = sum(ORBabserr)/size(ORBabserr,1)
 
 hfig = figure(4)
 plot(t,ORBabserrp)
