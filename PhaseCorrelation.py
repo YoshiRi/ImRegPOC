@@ -16,12 +16,13 @@ def CenterOfGravity(mat):
 
 # Weighted Center Of Gravity
 def WeightedCOG(mat):
-    try:
+    if mat.size == 0:
+        print("Skip subpixel estimation!")
+        Res = [0,0]
+    else:
         peak = mat.max()
         newmat = mat*(mat>peak/10)
         Res = CenterOfGravity(newmat)
-    except:
-        Res = 0
     return Res
 
 # Phase Correlation

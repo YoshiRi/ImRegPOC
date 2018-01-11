@@ -61,9 +61,7 @@ def EvaluationFP(filename,DES = "SIFT"):
     np.savetxt(filename + DES + 'Estimation.csv',Estimated,delimiter=',')
     np.savetxt(filename +'FPnum'+ DES +'.csv',FPnum,delimiter=',')
 
-
-
-if __name__ == '__main__':
+def getDir():
     # Get Module
     import os, tkinter, tkinter.filedialog, tkinter.messagebox
 
@@ -75,6 +73,15 @@ if __name__ == '__main__':
     tkinter.messagebox.showinfo('Choose DataSet Directory','Choose Dataset Directory')
     dirn = tkinter.filedialog.askdirectory(initialdir = iDir)
     dirname = dirn+'/'
+    return dirname
+
+if __name__ == '__main__':
+    import sys
+    args = sys.argv
+    if len(args) == 2:
+        dirname = args[1]
+    else:
+        dirname = getDir()
 
     # Do Evaluation
     EvaluationPOC(dirname)
