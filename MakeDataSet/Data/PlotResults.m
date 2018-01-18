@@ -5,7 +5,7 @@ close all
 
 %% LOAD 
 
-folder = 'Test4/'
+folder = 'Test1/'
 
 
 gt = load([folder,'TrueParam.csv']);
@@ -104,3 +104,8 @@ grid on
 pfig = pubfig(hfig);
 pfig.LegendLoc = 'best';
 pfig.FigDim = [15 11];
+
+%%
+AvgErr
+SIFTAvgErr
+ORBAvgErr

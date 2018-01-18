@@ -12,10 +12,12 @@ def POC(a,b):
     b = b.astype(np.float32)
     height,width = a.shape
     hann = cv2.createHanningWindow((height, width),cv2.CV_64F)
-    rhann = np.sqrt(hann)
+    # rhann = np.sqrt(hann)
+    
     # Windowing and FFT
-    G_a = np.fft.fft2(a*rhann)
-    G_b = np.fft.fft2(b*rhann)
+    G_a = np.fft.fft2(a*hann)
+    G_b = np.fft.fft2(b*hann)
+
 
     # 1. Get Rotation and Scaling Error
     # 1.1: Frequency Whitening  

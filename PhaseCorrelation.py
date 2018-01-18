@@ -28,13 +28,16 @@ def WeightedCOG(mat):
 # Phase Correlation
 def PhaseCorrelation(a, b):
     height,width = a.shape
-    dt = a.dtype # data type
+    #dt = a.dtype # data type
     # Windowing
     hann_ = cv2.createHanningWindow((height, width),cv2.CV_64F)
-    hann = hann_.astype(dt) # convert to correspoinding dtype
+    #hann = hann_.astype(dt) # convert to correspoinding dtype
+    rhann = np.sqrt(hann_)
+    rhann = hann_
+
     # FFT
-    G_a = np.fft.fft2(a*hann)
-    G_b = np.fft.fft2(b*hann)
+    G_a = np.fft.fft2(a*rhann)
+    G_b = np.fft.fft2(b*rhann)
     conj_b = np.ma.conjugate(G_b)
     R = G_a*conj_b
     R /= np.absolute(R)
