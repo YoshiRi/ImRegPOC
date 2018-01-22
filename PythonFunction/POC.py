@@ -1,3 +1,16 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+''' Phase Correlation based image matching and registration libraries
+'''
+__author__ = "Yoshi Ri"
+__copyright__ = "Copyright 2017, The University of Tokyo"
+__credits__ = ["Yoshi Ri"]
+__license__ = "BSD"
+__version__ = "1.0.1"
+__maintainer__ = "Yoshi Ri"
+__email__ = "yoshiyoshidetteiu@gmail.com"
+__status__ = "Production"
+
 # Phase Correlation to Estimate Pose
 import cv2
 import numpy as np
