@@ -9,17 +9,32 @@ If you used this programs, please cite our paper below:
 
 >  Y. Ri, H. Hiroshi Fujimoto. : \`\`Practical Phase-Only Correlation Algorithm for Robust and Accurate Image Sencing'', <i> Now Under Review </i> Vol. X, pp.XX. (20XX) 
 
-## Getting started 
-### Prerequirements
-This package requires python3.X and opencv3.X and other related sources.
+# Getting started 
+## Requirements
+- Python3.X (3.5 is recommended)
+- Opencv3.X
+- Numpy
 
-For windows and Linux users, anaconda is one of the choise to install both of this.
+For windows and Linux users, **anaconda** is one of the choise to install both of this.
 
-### Instaling
+## Install
 
+```
+pip install imregpoc
+```
 
 ## Running the tests
 
+
+# LICENSE
+BSD license
+
+## Citation
+Currently please refer [following paper](http://hflab.k.u-tokyo.ac.jp/papers/2017/SAMCON2017_ri.pdf)
+:
+> Y. Ri and H. Fujimoto, “Image Based Visual Servo Application on Video Tracking with Monocular Camera Based on Phase Correlation Method,” The 3rd IEEJ international workshop on Sensing, Actuation, Motion Control, and Optimization, 2017.
+
+This paper will be updated sooner.
 
 # Short description
 ## 1. Phase-Correlation based Translation Estimate (POC)

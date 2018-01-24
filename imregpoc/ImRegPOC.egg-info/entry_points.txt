@@ -1,0 +1,4 @@
+  # コマンドラインにするときのエントリーポイント、pitchpx/__init__.pyの関数をエントリーポイントにしました.
+        [console_scripts]
+        pitchpx = pitchpx:main
+    

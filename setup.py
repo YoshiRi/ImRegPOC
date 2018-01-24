@@ -26,16 +26,12 @@ setup(
     keywords=['Image Registration', 'POC', 'FFT'], 
     license='BSD License', 
     install_requires=[ 
-        'cv2',
+        'opencv-python',
         'numpy',
         'matplotlib',
-        'sys',
-        'os',
-        'random',
-        'tkinter',
     ],
     entry_points="""  # コマンドラインにするときのエントリーポイント、pitchpx/__init__.pyの関数をエントリーポイントにしました.
         [console_scripts]
-        pitchpx = pitchpx:main
+        imregpoc = imregpoc:main
     """,
 )

@@ -1,0 +1,13 @@
+ImRegPOC.egg-info/PKG-INFO
+ImRegPOC.egg-info/SOURCES.txt
+ImRegPOC.egg-info/dependency_links.txt
+ImRegPOC.egg-info/entry_points.txt
+ImRegPOC.egg-info/requires.txt
+ImRegPOC.egg-info/top_level.txt
+imregpoc/FeatureBasedMatching.py
+imregpoc/POC.py
+imregpoc/POCLibrary.py
+imregpoc/PhaseCorrelation.py
+imregpoc/TestFunction.py
+imregpoc/WarpFunction.py
+imregpoc/__init__.py
