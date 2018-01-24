@@ -10,9 +10,10 @@ If you used this programs, please cite our paper below:
 >  Y. Ri, H. Hiroshi Fujimoto. : \`\`Practical Phase-Only Correlation Algorithm for Robust and Accurate Image Sencing'', <i> Now Under Review </i> Vol. X, pp.XX. (20XX) 
 
 ## Getting started 
-
-
 ### Prerequirements
+This package requires python3.X and opencv3.X and other related sources.
+
+For windows and Linux users, anaconda is one of the choise to install both of this.
 
 ### Instaling
 
