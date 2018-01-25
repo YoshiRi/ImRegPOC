@@ -99,7 +99,7 @@ class TempMatcher:
         if Affine is None:
             return [0,0,0,1]
         
-        # Estraction
+        # Extraction
         A2 = Affine*Affine
         scale = math.sqrt(np.sum(A2[0:2,0:2])/2.0)
         theta = math.atan2(Affine[0,1],Affine[0,0])

@@ -21,7 +21,7 @@ def EvalError(Ref,Est):
     return AVG,STD
 
 def POCErr(Ref,Est,peaks):
-    th = 0.02
+    th = 0.06
     #print(np.where(peaks>th))
     i,= np.where(peaks>th) 
     nRef = Ref[i,:] 
@@ -53,7 +53,7 @@ def EvaluationPOC(filename):
 
     np.savetxt(filename +'POCEstimation.csv',Estimated,delimiter=',')
     np.savetxt(filename +'POCpeak.csv',pocPeaks,delimiter=',')
-    return POCErr(GTdata,Estimated,pocPeaks)
+    return 
 
 def EvaluationFP(filename,DES = "SIFT"):
     refname = filename + 'ref.png'
@@ -79,7 +79,7 @@ def EvaluationFP(filename,DES = "SIFT"):
 
     np.savetxt(filename + DES + 'Estimation.csv',Estimated,delimiter=',')
     np.savetxt(filename +'FPnum'+ DES +'.csv',FPnum,delimiter=',')
-    return EvalError(GTdata,Estimated)
+    return
 
 def getDir():
     # Get Module
@@ -108,6 +108,7 @@ def Comparison(filename):
     e1 = POCErr(GTdata,POCdata,POCpeaks)
     e2 = EvalError(GTdata,SIFTdata)
     e3 = EvalError(GTdata,ORBdata)
+
 
     ylim = max(e1[0].max(),e2[0].max(),e3[0].max())
     plt.subplot(311)

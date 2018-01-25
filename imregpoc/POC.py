@@ -57,9 +57,8 @@ def POC(a,b):
     LPB_filt = LPB*Mask
 
     # 1.4: Phase Correlate to Get Rotation and Scaling
-    Diff,peak = cv2.phaseCorrelate(LPA_filt,LPB_filt)
     Diff,peak = PhaseCorrelation(LPA_filt,LPB_filt)
-    # print('DXDY',Diff,'peak',peak)
+    # Do not use "cv2.phaseCorrelate(LPA_filt,LPB_filt)" because the 2nd order fitting process is not suitable for this fucntion.
     
     #  Final output of scale and rotation
     theta1 = 360 * Diff[1] / height; # deg
@@ -73,9 +72,9 @@ def POC(a,b):
     b2 = Warp_4dof(b,0,0,theta2*math.pi/180,invscale)
     
     # 2.2 : Translation estimation
-    diff1, peak1 = PhaseCorrelation(a,b1)
-    diff2, peak2 = PhaseCorrelation(a,b2)
-    # You can also use cv2.phaseCorrelate(a,b1)
+    diff1, peak1 = cv2.phaseCorrelate(a,b1)     #diff1, peak1 = PhaseCorrelation(a,b1)
+    diff2, peak2 = cv2.phaseCorrelate(a,b2)     #diff2, peak2 = PhaseCorrelation(a,b2)
+    # Use cv2.phaseCorrelate(a,b1) because it is much faster
 
     # 2.3: Compare peaks and choose true rotational error
     if peak1 > peak2:
