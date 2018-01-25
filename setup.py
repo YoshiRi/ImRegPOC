@@ -27,6 +27,7 @@ setup(
     license='BSD License', 
     install_requires=[ 
         'opencv-python',
+        'opencv-contrib-python',
         'numpy',
         'matplotlib',
     ],

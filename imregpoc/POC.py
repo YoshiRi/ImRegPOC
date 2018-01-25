@@ -45,11 +45,11 @@ def POC(a,b):
     
     # 1.3: Filtering
     # --------------- Tuning parameter ----------------
-    lpmin_tuning = 1/2.0 # default 1/2
+    lpmin_tuning = 0.5   # default 0.5
     lpmax_tuning = 0.8   # default 0.8
     # -------------------------------------------------
     LPmin = math.floor(Mag*math.log(lpmin_tuning*width/2.0/math.pi))
-    LPmax = math.floor(Mag*math.log(width*lpmax_tuning/2))
+    LPmax = min(width, math.floor(Mag*math.log(width*lpmax_tuning/2)))
     assert LPmax > LPmin, 'Invalid condition!\n Enlarge lpmax tuning parameter or lpmin_tuning parameter'
     Tile = np.repeat([0.0,1.0,0.0],[LPmin-1,LPmax-LPmin+1,width-LPmax])
     Mask = np.tile(Tile,[height,1])
@@ -64,7 +64,8 @@ def POC(a,b):
     #  Final output of scale and rotation
     theta1 = 360 * Diff[1] / height; # deg
     theta2 = theta1 + 180; # deg theta ambiguity
-    invscale = math.pow(float(width),Diff[0]/float(width))
+    #invscale = math.pow(float(width),Diff[0]/float(width))
+    invscale = math.exp(Diff[0]/Mag)
     # print('Theta? ',-theta1,'Scale ',1/invscale)
     
     # 2.1: Correct rotation and scaling
