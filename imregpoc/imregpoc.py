@@ -194,7 +194,6 @@ class imregpoc:
     def showTranslationPeak(self):
         plt.subplot(211)
         plt.imshow(self.r1,vmin=self.r1.min(),vmax=self.r1.max(),cmap='gray')
-        plt.show()
         plt.subplot(212)
         plt.imshow(self.r2,vmin=self.r2.min(),vmax=self.r2.max(),cmap='gray')
         plt.show()
@@ -204,3 +203,15 @@ class imregpoc:
         if self.peak > self.th:
             return 1
         return 0
+
+
+
+if __name__ == "__main__":
+    # Read image
+    ref = cv2.imread('../luna1.png',0)
+    plt.imshow(ref,cmap="gray")
+
+    # reference parameter (you can change this)
+    match = imregpoc(ref,ref)
+    print(match.peak,match.param)
+    match.showTranslationPeak()
