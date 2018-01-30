@@ -43,14 +43,14 @@ class imregpoc:
         G_b = np.fft.fft2(self.cmp*self.hanw)
 
         # 1.1: Frequency Whitening  
-        LA = np.fft.fftshift(np.log(np.absolute(G_a)+1))
-        LB = np.fft.fftshift(np.log(np.absolute(G_b)+1))
+        self.LA = np.fft.fftshift(np.log(np.absolute(G_a)+1))
+        self.LB = np.fft.fftshift(np.log(np.absolute(G_b)+1))
         # 1.2: Log polar Transformation
         cx = self.center[1]
         cy = self.center[0]
         Mag = width/math.log(width)
-        self.LPA = cv2.logPolar(LA, (cy, cx), Mag, cv2.INTER_LINEAR)
-        self.LPB = cv2.logPolar(LB, (cy, cx), Mag, cv2.INTER_LINEAR)
+        self.LPA = cv2.logPolar(self.LA, (cy, cx), Mag, flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        self.LPB = cv2.logPolar(self.LB, (cy, cx), Mag, flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
 
         # 1.3:filtering
         LPmin = math.floor(Mag*math.log(self.alpha*width/2.0/math.pi))
@@ -198,6 +198,21 @@ class imregpoc:
         plt.imshow(self.r2,vmin=self.r2.min(),vmax=self.r2.max(),cmap='gray')
         plt.show()
         
+    def showLPA(self):
+        plt.imshow(self.LPA,vmin=self.LPA.min(),vmax=self.LPA.max(),cmap='gray')
+        plt.show()
+
+    def showLPB(self):
+        plt.imshow(self.LPB,vmin=self.LPB.min(),vmax=self.LPB.max(),cmap='gray')
+        plt.show()
+
+    def showMAT(self,MAT):
+        plt.figure()
+        plt.imshow(MAT,vmin=MAT.min(),vmax=MAT.max(),cmap='gray')
+        plt.show()
+        
+    def saveMat(self,MAT,name):
+        cv2.imwrite(name,cv2.normalize(MAT,  MAT, 0, 255, cv2.NORM_MINMAX))
 
     def isSucceed(self):
         if self.peak > self.th:
@@ -208,10 +223,16 @@ class imregpoc:
 
 if __name__ == "__main__":
     # Read image
-    ref = cv2.imread('../luna1.png',0)
+    ref = cv2.imread('../testref1.png',0)
+    cmp = cv2.imread('../testcmp1.png',0)
     plt.imshow(ref,cmap="gray")
 
     # reference parameter (you can change this)
-    match = imregpoc(ref,ref)
+    match = imregpoc(ref,cmp)
     print(match.peak,match.param)
-    match.showTranslationPeak()
+
+    # Save particular Image
+    #match.saveMat(match.LPA,'LPA.png')
+    #match.saveMat(match.LPA_filt,'LPA_filt.png')
+    #match.saveMat(match.LA,'LA.png')
+    
