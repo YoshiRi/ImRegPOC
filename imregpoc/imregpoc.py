@@ -219,7 +219,34 @@ class imregpoc:
             return 1
         return 0
 
+    # function around mosaicing
+    def convertRectangle(self):
+        height,width = self.cmp.shape
+        rectangles = np.float32([[0,0, 0,width-1, height-1,0, height-1,width-1]]).reshape(1,4,2)
+        converted_rectangle = cv2.perspectiveTransform(rectangles,np.inv(self.perspective))
+        xmax = math.ceil(converted_rectangle[0,:,0].max())
+        xmin = math.floor(converted_rectangle[0,:,0].min())
+        ymax = math.ceil(converted_rectangle[0,:,1].max())
+        ymin = math.floor(converted_rectangle[0,:,1].min())
+        return [xmin,ymin,xmax,ymax]
 
+    def stitching(self):
+        xmin,ymin,xmax,ymax = self.convertRectangle()
+        hei,wid = self.ref
+        sxmax = max(xmax,wid-1)
+        sxmin = min(xmin,0)
+        symax = max(ymax,hei-1)
+        symin = min(ymin,1)
+        swidth,sheight = sxmax-sxmin+1,symax-symin+1
+        xtrans,ytrans = 0-sxmin,0-symin
+        Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
+        newTrans = np.dot(Trans,np.inv(self.perspective))
+        warpedimage = cv2.warpPerspective(self.cmp,newTrans,(sheight,swidth),flags=CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS)
+        warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.ref
+        plt.figure()
+        plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
+        plt.show()
+        
 
 if __name__ == "__main__":
     # Read image
@@ -230,7 +257,7 @@ if __name__ == "__main__":
     # reference parameter (you can change this)
     match = imregpoc(ref,cmp)
     print(match.peak,match.param)
-
+    match.stitching()
     # Save particular Image
     #match.saveMat(match.LPA,'LPA.png')
     #match.saveMat(match.LPA_filt,'LPA_filt.png')
