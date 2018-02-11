@@ -220,17 +220,21 @@ class imregpoc:
         return 0
 
     # function around mosaicing
-    def convertRectangle(self):
+    def convertRectangle(self,perspective=None):
+        if perspective = None:
+            perspective = self.perspective
         height,width = self.cmp.shape
         rectangles = np.float32([[0,0, 0,width-1, height-1,0, height-1,width-1]]).reshape(1,4,2)
-        converted_rectangle = cv2.perspectiveTransform(rectangles,np.linalg.inv(self.perspective))
+        converted_rectangle = cv2.perspectiveTransform(rectangles,np.linalg.inv(perspective))
         xmax = math.ceil(converted_rectangle[0,:,0].max())
         xmin = math.floor(converted_rectangle[0,:,0].min())
         ymax = math.ceil(converted_rectangle[0,:,1].max())
         ymin = math.floor(converted_rectangle[0,:,1].min())
         return [xmin,ymin,xmax,ymax]
 
-    def stitching(self):
+    def stitching(self,perspective=None):
+        if perspective == None:
+            perspective = self.perspective
         xmin,ymin,xmax,ymax = self.convertRectangle()
         hei,wid = self.ref.shape
         sxmax = max(xmax,wid-1)
@@ -240,34 +244,12 @@ class imregpoc:
         swidth,sheight = sxmax-sxmin+1,symax-symin+1
         xtrans,ytrans = 0-sxmin,0-symin
         Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
-        newTrans = np.dot(Trans,np.linalg.inv(self.perspective))
+        newTrans = np.dot(Trans,np.linalg.inv(perspective))
         warpedimage = cv2.warpPerspective(self.cmp,newTrans,(sheight,swidth),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
         warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.ref
         plt.figure()
         plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
         plt.show()
-
-    def ref_stitch(self):
-        center = np.array(self.ref.shape)/2
-        persp = self.poc2warp(center,[-5.40E+01,-2.00E+00,9.72E+01/180*math.pi,6.03E-01])
-        xmin,ymin,xmax,ymax = self.convertRectangle()
-        hei,wid = self.ref.shape
-        sxmax = max(xmax,wid-1)
-        sxmin = min(xmin,0)
-        symax = max(ymax,hei-1)
-        symin = min(ymin,1)
-        swidth,sheight = sxmax-sxmin+1,symax-symin+1
-        xtrans,ytrans = 0-sxmin,0-symin
-        Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
-        newTrans = np.dot(Trans,np.linalg.inv(persp))
-        warpedimage = cv2.warpPerspective(self.cmp,newTrans,(sheight,swidth),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
-        warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.ref
-        plt.figure()
-        plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
-        plt.show()
-
-
-        
 
 if __name__ == "__main__":
     # Read image
@@ -279,7 +261,9 @@ if __name__ == "__main__":
     match = imregpoc(ref,cmp)
     print(match.peak,match.param)
     match.stitching()
-    match.ref_stitch()
+    center = np.array(ref.shape)/2
+    persp = match.poc2warp(center,[-5.40E+01,-2.00E+00,9.72E+01/180*math.pi,6.03E-01])
+    match.stitching(persp)
     # Save particular Image
     #match.saveMat(match.LPA,'LPA.png')
     #match.saveMat(match.LPA_filt,'LPA_filt.png')
