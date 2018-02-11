@@ -48,24 +48,24 @@ class imregpoc:
         # 1.2: Log polar Transformation
         cx = self.center[1]
         cy = self.center[0]
-        Mag = width/math.log(width)
-        self.LPA = cv2.logPolar(self.LA, (cy, cx), Mag, flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
-        self.LPB = cv2.logPolar(self.LB, (cy, cx), Mag, flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        self.Mag = width/math.log(width)
+        self.LPA = cv2.logPolar(self.LA, (cy, cx), self.Mag, flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        self.LPB = cv2.logPolar(self.LB, (cy, cx), self.Mag, flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
 
         # 1.3:filtering
-        LPmin = math.floor(Mag*math.log(self.alpha*width/2.0/math.pi))
-        LPmax = min(width, math.floor(Mag*math.log(width*self.beta/2)))
+        LPmin = math.floor(self.Mag*math.log(self.alpha*width/2.0/math.pi))
+        LPmax = min(width, math.floor(self.Mag*math.log(width*self.beta/2)))
         assert LPmax > LPmin, 'Invalid condition!\n Enlarge lpmax tuning parameter or lpmin_tuning parameter'
         Tile = np.repeat([0.0,1.0,0.0],[LPmin-1,LPmax-LPmin+1,width-LPmax])
-        Mask = np.tile(Tile,[height,1])
-        self.LPA_filt = self.LPA*Mask
-        self.LPB_filt = self.LPB*Mask
+        self.Mask = np.tile(Tile,[height,1])
+        self.LPA_filt = self.LPA*self.Mask
+        self.LPB_filt = self.LPB*self.Mask
 
         # 1.4: Phase Correlate to Get Rotation and Scaling
         Diff,peak,self.r_rotatescale = self.PhaseCorrelation(self.LPA_filt,self.LPB_filt)
         theta1 = 2*math.pi * Diff[1] / height; # deg
         theta2 = theta1 + math.pi; # deg theta ambiguity
-        invscale = math.exp(Diff[0]/Mag)
+        invscale = math.exp(Diff[0]/self.Mag)
         # 2.1: Correct rotation and scaling
         b1 = self.Warp_4dof(self.cmp,[0,0,theta1,invscale])
         b2 = self.Warp_4dof(self.cmp,[0,0,theta2,invscale])
@@ -96,6 +96,49 @@ class imregpoc:
         self.perspective = self.poc2warp(self.center,self.param)
         self.affine = self.perspective[0:2,:]
 
+    def match_new(self, newImg):
+        self.cmp = newImg
+        height,width = self.cmp.shape
+        cy,cx = height/2,width/2
+        G_b = np.fft.fft2(self.cmp*self.hanw)
+        self.LB = np.fft.fftshift(np.log(np.absolute(G_b)+1))
+        self.LPB = cv2.logPolar(self.LB, (cy, cx), self.Mag, flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        self.LPB_filt = self.LPB*self.Mask
+        # 1.4: Phase Correlate to Get Rotation and Scaling
+        Diff,peak,self.r_rotatescale = self.PhaseCorrelation(self.LPA_filt,self.LPB_filt)
+        theta1 = 2*math.pi * Diff[1] / height; # deg
+        theta2 = theta1 + math.pi; # deg theta ambiguity
+        invscale = math.exp(Diff[0]/self.Mag)
+        # 2.1: Correct rotation and scaling
+        b1 = self.Warp_4dof(self.cmp,[0,0,theta1,invscale])
+        b2 = self.Warp_4dof(self.cmp,[0,0,theta2,invscale])
+    
+        # 2.2 : Translation estimation
+        diff1, peak1, self.r1 = self.PhaseCorrelation(self.ref,b1)     #diff1, peak1 = PhaseCorrelation(a,b1)
+        diff2, peak2, self.r2 = self.PhaseCorrelation(self.ref,b2)     #diff2, peak2 = PhaseCorrelation(a,b2)
+        # Use cv2.phaseCorrelate(a,b1) because it is much faster
+
+        # 2.3: Compare peaks and choose true rotational error
+        if peak1 > peak2:
+            Trans = diff1
+            peak = peak1
+            theta = -theta1
+        else:
+            Trans = diff2
+            peak = peak2
+            theta = -theta2
+
+        if theta > math.pi:
+            theta -= math.pi*2
+        elif theta < -math.pi:
+            theta += math.pi*2
+
+        # Results
+        self.param = [Trans[0],Trans[1],theta,1/invscale]
+        self.peak = peak
+        self.perspective = self.poc2warp(self.center,self.param)
+        self.affine = self.perspective[0:2,:]        
+        
     def poc2warp(self,center,param):
         cx,cy = center
         dx,dy,theta,scale = param
@@ -122,6 +165,8 @@ class imregpoc:
     # Get peak point
     def CenterOfGravity(self,mat):
         hei,wid = mat.shape
+        if hei != wid: # if mat size is not square, there must be something wrong 
+            return [0,0]
         Tile=np.arange(wid,dtype=float)-(wid-1.0)/2.0
         Tx = np.tile(Tile,[hei,1]) # Ty = Tx.T
         Sum = np.sum(mat)
@@ -137,7 +182,7 @@ class imregpoc:
             Res = [0,0]
         else:
             peak = mat.max()
-            newmat = mat*(mat>peak/10)
+            newmat = mat*(mat>peak/10) # discard information of lower peak
             Res = self.CenterOfGravity(newmat)
         return Res
 
@@ -221,7 +266,7 @@ class imregpoc:
 
     # function around mosaicing
     def convertRectangle(self,perspective=None):
-        if perspective = None:
+        if perspective == None:
             perspective = self.perspective
         height,width = self.cmp.shape
         rectangles = np.float32([[0,0, 0,width-1, height-1,0, height-1,width-1]]).reshape(1,4,2)
@@ -260,6 +305,9 @@ if __name__ == "__main__":
     # reference parameter (you can change this)
     match = imregpoc(ref,cmp)
     print(match.peak,match.param)
+    match_new = imregpoc(ref,cmp)
+    print(match.peak,match.param)
+
     match.stitching()
     center = np.array(ref.shape)/2
     persp = match.poc2warp(center,[-5.40E+01,-2.00E+00,9.72E+01/180*math.pi,6.03E-01])
