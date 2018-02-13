@@ -165,7 +165,8 @@ class imregpoc:
     # Get peak point
     def CenterOfGravity(self,mat):
         hei,wid = mat.shape
-        if hei != wid: # if mat size is not square, there must be something wrong 
+        if hei != wid: # if mat size is not square, there must be something wrong
+            print("Skip subpixel estimation!")
             return [0,0]
         Tile=np.arange(wid,dtype=float)-(wid-1.0)/2.0
         Tx = np.tile(Tile,[hei,1]) # Ty = Tx.T
@@ -285,12 +286,12 @@ class imregpoc:
         sxmax = max(xmax,wid-1)
         sxmin = min(xmin,0)
         symax = max(ymax,hei-1)
-        symin = min(ymin,1)
+        symin = min(ymin,0)
         swidth,sheight = sxmax-sxmin+1,symax-symin+1
         xtrans,ytrans = 0-sxmin,0-symin
         Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
         newTrans = np.dot(Trans,np.linalg.inv(perspective))
-        warpedimage = cv2.warpPerspective(self.cmp,newTrans,(sheight,swidth),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        warpedimage = cv2.warpPerspective(self.cmp,newTrans,(swidth,sheight),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
         warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.ref
         plt.figure()
         plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
