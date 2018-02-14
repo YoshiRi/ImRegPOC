@@ -17,8 +17,9 @@ sys.path.append('../')
 # Each Function are at different Part
 import imregpoc
 import cv2
+import math
 
-class VideoStiching():
+class VideoStiching:
 
     def __init__(self,videoname):
         vidcap = cv2.VideoCapture(videoname)
@@ -188,3 +189,47 @@ class VideoStiching():
         cv2.imwrite('panoramaimg.png',self.panorama)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
+    def extract_relationship_FP(self):
+        self.xMat = np.zeros((self.framenum,self.framenum),dtype=float)
+        self.yMat = np.zeros((self.framenum,self.framenum),dtype=float)
+        self.thMat = np.zeros((self.framenum,self.framenum),dtype=float)
+        self.sMat = np.zeros((self.framenum,self.framenum),dtype=float)
+        self.matchedNum = np.zeros((self.framenum,self.framenum),dtype=float)
+        self.inliersNum = np.zeros((self.framenum,self.framenum),dtype=float)
+
+        for i in range (0,self.framenum-1):
+            match = imregpoc.TempMatcher(self.frames[i],'SIFT')
+
+            for j in range (i+1,self.framenum):
+                param,counts,inlier = match.match(self.frames[j])
+                x,y,th,s = param
+                self.xMat[i,j] = x
+                self.yMat[i,j] = y
+                self.thMat[i,j] = th/180*math.pi
+                self.sMat[i,j] = s
+                self.matchedNum[i,j] = counts
+                self.inliersNum[i,j] = inlier
+                print('['+str(i)+','+str(j)+']', end='\r')
+
+        saveMat = np.concatenate([self.xMat,self.yMat,self.thMat,self.sMat,self.matchedNum,self.inliersNum], axis=0)
+        output = self.vname+'_FP'+'.csv'
+        np.savetxt(output,saveMat,delimiter=',')
+
+    def load_FP(self):
+        output = self.vname+'_FP'+'.csv'
+        readMat = np.loadtxt(output,delimiter=',')
+        Mats = np.split(readMat,6,axis=0)
+        self.xMat = Mats[0]
+        self.yMat = Mats[1]
+        self.thMat = Mats[2]
+        self.sMat = Mats[3]
+        self.matchedNum = Mats[4]
+        self.inliersNum = Mats[5]
+
+    def getPeak_FP(self,threshold = 0):
+        if threshold == 0:
+            threshold = 50
+        self.PeakMat = np.copy(self.inliersNum)
+        self.PeakMat[self.PeakMat<threshold]=0
+        self.PeakMat[self.PeakMat>=threshold]=1

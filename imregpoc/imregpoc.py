@@ -297,6 +297,140 @@ class imregpoc:
         plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
         plt.show()
 
+class TempMatcher:
+
+    def __init__(self,temp,descriptor = 'ORB'):
+        
+        # switch detector and matcher
+        self.detector = self.get_des(descriptor)
+        self.bf =  self.get_matcher(descriptor)# self matcher
+        
+        if self.detector == 0:
+            print("Unknown Descriptor! \n")
+            sys.exit()
+        
+        if len(temp.shape) > 2: #if color then convert BGR to GRAY
+            temp = cv2.cvtColor(temp, cv2.COLOR_BGR2GRAY)
+        
+        self.template = temp
+        #self.imsize = np.shape(self.template)
+        self.kp1, self.des1 = self.detector.detectAndCompute(self.template,None)        
+        self.kpb,self.desb = self.kp1, self.des1
+        self.flag = 0 # homography estimated flag
+        self.scalebuf = []
+        self.scale = 0
+        self.H = np.eye(3,dtype=np.float32)
+        self.dH1 = np.eye(3,dtype=np.float32)
+        self.dH2 = np.eye(3,dtype=np.float32)
+        self.matches = []        
+        self.inliers = []        
+        self.center = np.float32([temp.shape[1],temp.shape[0]]).reshape([1,2])/2
+
+    def get_des(self,name):
+        return {
+            'ORB': cv2.ORB_create(nfeatures=500,scoreType=cv2.ORB_HARRIS_SCORE),
+            'AKAZE': cv2.AKAZE_create(),
+            'KAZE' : cv2.KAZE_create(),
+            'SIFT' : cv2.xfeatures2d.SIFT_create(),
+            'SURF' : cv2.xfeatures2d.SURF_create()
+        }.get(name, 0)  
+    
+    def get_matcher(self,name): # Binary feature or not 
+        return {
+            'ORB'  : cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True),
+            'AKAZE': cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True),
+            'KAZE' : cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True),
+            'SIFT' : cv2.BFMatcher(),
+            'SURF' : cv2.BFMatcher()
+        }.get(name, 0)  
+    
+    def match(self,img):
+        if len(img.shape) > 2: #if color then convert BGR to GRAY
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+             
+        kp2,des2 = self.detector.detectAndCompute(img,None)
+        #print(len(kp2))
+        if len(kp2) < 5:
+            return
+            
+        matches = self.bf.knnMatch(self.des1,des2,k=2)
+        good = []
+        pts1 = []
+        pts2 = []
+   
+        count = 0
+        for m,n in matches:      
+            if m.distance < 0.5*n.distance:
+                good.append([m])
+                pts2.append(kp2[m.trainIdx].pt)
+                pts1.append(self.kp1[m.queryIdx].pt)
+                count += 1
+
+        pts1 = np.float32(pts1)
+        pts2 = np.float32(pts2)
+
+        self.flag = 0
+        self.show = img
+        self.matches.append(count)        
+        self.inliner = 0
+
+        if count > 4:
+            self.H, self.mask = cv2.findHomography(pts1-self.center, pts2-self.center, cv2.RANSAC,3.0)
+            self.inliner = np.count_nonzero(self.mask)
+
+        
+        param = self.Getpoc()
+        return param, count, self.inliner
+        
+    def Getpoc(self):
+        h,w = self.template.shape
+        #Affine = MoveCenterOfImage(self.H,[0,0],[w/2,h/2]) 
+        Affine = self.H
+
+        if Affine is None:
+            return [0,0,0,1]
+        
+        # Extraction
+        A2 = Affine*Affine
+        scale = math.sqrt(np.sum(A2[0:2,0:2])/2.0)
+        theta = math.atan2(Affine[0,1],Affine[0,0])
+
+        theta = theta*180.0/math.pi
+
+        Trans = np.dot(np.linalg.inv(Affine[0:2,0:2]),Affine[0:2,2:3])
+        return [Trans[0],Trans[1],theta,scale]
+
+    def convertRectangle(self,perspective=None):
+        if perspective == None:
+            perspective = self.H
+        height,width = self.cmp.shape
+        rectangles = np.float32([[0,0, 0,width-1, height-1,0, height-1,width-1]]).reshape(1,4,2)
+        converted_rectangle = cv2.perspectiveTransform(rectangles,np.linalg.inv(perspective))
+        xmax = math.ceil(converted_rectangle[0,:,0].max())
+        xmin = math.floor(converted_rectangle[0,:,0].min())
+        ymax = math.ceil(converted_rectangle[0,:,1].max())
+        ymin = math.floor(converted_rectangle[0,:,1].min())
+        return [xmin,ymin,xmax,ymax]
+
+    def stitching(self,perspective=None):
+        if perspective == None:
+            perspective = self.H
+        xmin,ymin,xmax,ymax = self.convertRectangle()
+        hei,wid = self.ref.shape
+        sxmax = max(xmax,wid-1)
+        sxmin = min(xmin,0)
+        symax = max(ymax,hei-1)
+        symin = min(ymin,0)
+        swidth,sheight = sxmax-sxmin+1,symax-symin+1
+        xtrans,ytrans = 0-sxmin,0-symin
+        Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
+        newTrans = np.dot(Trans,np.linalg.inv(perspective))
+        warpedimage = cv2.warpPerspective(self.cmp,newTrans,(swidth,sheight),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.ref
+        plt.figure()
+        plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
+        plt.show()
+
 if __name__ == "__main__":
     # Read image
     ref = cv2.imread('../testref1.png',0)
