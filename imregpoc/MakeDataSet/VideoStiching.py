@@ -233,3 +233,9 @@ class VideoStiching:
         self.PeakMat = np.copy(self.inliersNum)
         self.PeakMat[self.PeakMat<threshold]=0
         self.PeakMat[self.PeakMat>=threshold]=1
+
+
+
+## debugging 
+# matlab theta, + and degree
+# python theta, - and radian
