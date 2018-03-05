@@ -19,12 +19,25 @@ def cropCenter(Img,Size):
     #print(cy-sy,cy+sy,cx-sx,cx+sx)
     return Img[cy-sy:cy+sy,cx-sx:cx+sx]
 
+def addGaussianNoise(src):
+    row,col= src.shape
+    mean = 0
+    var = 0.1
+    sigma = 15
+    gauss = np.random.normal(mean,sigma,(row,col))
+    gauss = gauss.reshape(row,col)
+    noisy = src + gauss
 
-def MakeDataSet(Temp,nS=256, outfolder = 'Data/Test1/'):
+    return noisy
+
+def MakeDataSet(Temp,nS=256,outfolder = 'Data/Test1',DataNum = 100):
     import random
     import os
-    if not os.path.exists(outfolder):
-        os.makedirs(outfolder)
+    if not os.path.exists(outfolder+'/'):
+        os.makedirs(outfolder+'/')
+    if not os.path.exists(outfolder+'_noised'+'/'):
+        os.makedirs(outfolder+'_noised'+'/')
+
     # Define size : nS = 256
     hei,wid = Temp.shape
     cy,cx = hei/2 ,wid/2 
@@ -33,14 +46,17 @@ def MakeDataSet(Temp,nS=256, outfolder = 'Data/Test1/'):
     A_ref = poc2warp(cx,cy,0,0,0,1)
     Iref = cv2.warpPerspective(Temp,A_ref,(wid,hei))
     cIref=cropCenter(Iref,[nS,nS])
-    cv2.imwrite(outfolder+'ref.png',cIref)
+    cv2.imwrite(outfolder+'/'+'ref.png',cIref)
+    cv2.imwrite(outfolder+'_noised'+'/'+'ref.png',cIref)
+
 
     # Save Transfered Image
     iterate = 1
     dataset = []
-    DataNum = 50
     for iterate in range(1,DataNum+1):
-        outname = outfolder +'cmp' + str(iterate) + '.png'
+        outname = outfolder +'/'+'cmp' + str(iterate) + '.png'
+        outname_n = outfolder +'_noised' +'/' +'cmp' + str(iterate) + '.png'
+
         rdx = random.randint(-nS/4,nS/4)
         rdy = random.randint(-nS/4,nS/4)
         rCta = random.uniform(-math.pi,math.pi)
@@ -50,11 +66,15 @@ def MakeDataSet(Temp,nS=256, outfolder = 'Data/Test1/'):
         Icmp = cv2.warpPerspective(Temp,A_cmp,(wid,hei))
         cIcmp=cropCenter(Icmp,[nS,nS])
         cv2.imwrite(outname,cIcmp)
+        cv2.imwrite(outname_n,addGaussianNoise(cIcmp))
 
         # Save template in Txt
         dataset.append([rdx,rdy,rCta*180/math.pi,rS])
     dataset = np.array(dataset,np.float32).reshape(DataNum,4)
-    np.savetxt(outfolder+'TrueParam.csv',dataset,delimiter=',')
+    np.savetxt(outfolder+'/'+'TrueParam.csv',dataset,delimiter=',')
+    np.savetxt(outfolder+'_noised' +'/' +'TrueParam.csv',dataset,delimiter=',')
+
+
 
 def GetFileName():
     # Import module
@@ -85,4 +105,4 @@ if __name__ == '__main__':
     print(Temp.shape)
     
     foldname = input('Folder Name? : ')
-    MakeDataSet(Temp,nS,'Data/'+foldname+'/')
+    MakeDataSet(Temp,nS,'Data/'+foldname)

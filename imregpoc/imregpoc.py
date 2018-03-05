@@ -336,10 +336,10 @@ class TempMatcher:
         }.get(name, 0)  
     
     def get_matcher(self,name): # Binary feature or not 
-        return {
-            'ORB'  : cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True),
-            'AKAZE': cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True),
-            'KAZE' : cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True),
+        return {# Knnmatch do not need crossCheck
+            'ORB'  : cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False),
+            'AKAZE': cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False),
+            'KAZE' : cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False),
             'SIFT' : cv2.BFMatcher(),
             'SURF' : cv2.BFMatcher()
         }.get(name, 0)  
@@ -349,9 +349,9 @@ class TempMatcher:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
              
         kp2,des2 = self.detector.detectAndCompute(img,None)
-        #print(len(kp2))
+        print(len(kp2))
         if len(kp2) < 5:
-            return
+            return [0,0,0,1],0,0
             
         matches = self.bf.knnMatch(self.des1,des2,k=2)
         good = []
@@ -371,7 +371,7 @@ class TempMatcher:
 
         self.flag = 0
         self.show = img
-        self.matches.append(count)        
+        self.matches.append(count) #?
         self.inliner = 0
 
         if count > 4:
