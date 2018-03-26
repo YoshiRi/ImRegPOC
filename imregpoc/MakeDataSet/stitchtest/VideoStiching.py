@@ -18,6 +18,7 @@ sys.path.append('../../')
 import imregpoc
 import cv2
 import math
+import numpy as np
 
 class VideoStiching:
 
@@ -112,10 +113,31 @@ class VideoStiching:
         v = np.dot(np.linalg.inv(A),B)
         return v
 
+    def reduceMat(self,number):
+        buf = np.delete(self.sMat,number,0)
+        self.sMat = np.delete(buf,number,1)
+        buf = np.delete(self.thMat,number,0)
+        self.thMat = np.delete(buf,number,1)
+        buf = np.delete(self.xMat,number,0)
+        self.xMat = np.delete(buf,number,1)
+        buf = np.delete(self.yMat,number,0)
+        self.yMat = np.delete(buf,number,1)
+        del self.frames[number[0]]
+        del self.cframes[number[0]]
+
     def check_valid_mat(self,wMat):
         diagAvec = wMat.sum(axis=0).T + wMat.sum(axis=1)
-        if len(diagAvec) - np.count_nonzero(diagAvec) > 0:
-            print('Bad frames exists!')
+        zeronum = len(diagAvec) - np.count_nonzero(diagAvec)
+        if zeronum > 0:
+            print('Bad frames exists! Delete it.')
+            # delete bad features
+            zeropart = np.where(diagAvec==0)
+            self.reduceMat(zeropart)
+            buf = np.delete(self.wMat,number,0)
+            wMat = np.delete(buf,number,1)
+            self.framenum -= zeronum
+            return wMat
+        return wMat
 
 
     def Optimization(self,threshold=None):
@@ -125,7 +147,7 @@ class VideoStiching:
         wMat = self.PeakMat
         wMat[wMat <threshold] = 0
 
-        self.check_valid_mat(wMat)
+        wMat = self.check_valid_mat(wMat)
 
         # 2-1 optimize theta
         vth = self.solve_mat(self.thMat,wMat)
@@ -154,7 +176,7 @@ class VideoStiching:
     def load_results(self,fname):
         self.results = np.loadtxt(fname,delimiter=',')
 
-    def show_stitched(self):
+    def show_stitched(self,vname='output.avi'):
         self.match = imregpoc.imregpoc(self.frames[0],self.frames[0])
         hei, wid = self.frames[0].shape
         center =[hei/2,wid/2]
@@ -163,6 +185,7 @@ class VideoStiching:
         symax = hei-1
         symin = 0
         Perspectives = np.zeros((self.framenum,3,3),dtype=float)
+        # get panorama image size
         for i in range (0,self.framenum-1):
             perspect = self.match.poc2warp(center,self.results[i])
             xmin,ymin,xmax,ymax = self.match.convertRectangle(perspect)
@@ -176,6 +199,13 @@ class VideoStiching:
         Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
         self.panorama = np.zeros((sheight,swidth))
         self.panorama[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.match.ref
+        
+        # Define the codec and create VideoWriter object
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        #fourcc=cv2.VideoWriter_fourcc('W', 'M', 'V', '2')
+        Vidout = cv2.VideoWriter(vname,fourcc, 30.0, (swidth,sheight),0)
+        
+        # stiching
         for i in range (1,self.framenum-1):
             newTrans = np.dot(Trans,np.linalg.inv(Perspectives[i]))
             warpedimage = cv2.warpPerspective(self.frames[i],newTrans,(swidth,sheight),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
@@ -183,11 +213,14 @@ class VideoStiching:
             mask[mask < 1] = 0 
             Imask = np.ones((sheight,swidth),dtype=float)-mask
             self.panorama = self.panorama*Imask + warpedimage*mask
+            forwrite = self.panorama.astype(np.uint8)
+            Vidout.write(forwrite)
 
             cv2.imshow('panorama',self.panorama/255)
             cv2.waitKey(5)
         cv2.imwrite('panoramaimg.png',self.panorama)
         cv2.waitKey(0)
+        Vidout.release()# release video object 
         cv2.destroyAllWindows()
 
     def extract_relationship_FP(self):
