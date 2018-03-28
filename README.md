@@ -14,18 +14,28 @@ If you used this programs, please cite our paper below:
 # Getting started 
 ## Requirements
 - Python3.X (3.5 is recommended)
-- Opencv3.X
-- Numpy
+- opencv-python
+- opencv-contrib-python
+- numpy
+- matplotlib
 
-For windows and Linux users, **anaconda** is one of the choise to install both of this.
+Recommend opencv version is 3.X.
+For windows users, **anaconda** is one of the choise to install both of this.
 
 ## Install
 
 ```
-pip install imregpoc
+git clone https://github.com/YoshiRi/ImRegPOC
+python setup.py install
 ```
 
-## Running the tests
+## Demos
+
+### Phase Correlation
+
+### Template Maching with Feature Points
+
+### Image Stiching
 
 
 # LICENSE
@@ -38,26 +48,3 @@ Currently please refer [following paper](http://hflab.k.u-tokyo.ac.jp/papers/201
 
 This paper will be updated sooner.
 
-# Short description
-## 1. Phase-Correlation based Translation Estimate (POC)
-Image translation can be detected with the cross correlation of 2D FFT spectrum of spacial frequency.
-
-$$
-\begin{eqnarray}
- R(k_1,k_2)=\frac{F(k_1,k_2)\overline{G(k_1,k_2)}}{|F(k_1,k_2)\overline{G(k_1,k_2)}|}
-\end{eqnarray}
-$$
-
-## 2. Phase-Correlation based Rotation and Scaling Estimate (RIPOC)
-Using log-polar trasformation, rotation and scaling can also detected with phase correlation technique.
-
-
-$$
-\begin{eqnarray}
-	(\delta_x,\delta_y)=(N\theta/\pi,-N\log_N \kappa)
-\end{eqnarray}
-$$
-
-## Other related links
-
->  K. Takita, T. Aoki, Y. Sasaki, T. Higuchi and K. Kobayashi. : \`\`High-Accuracy Subpixel Image Registration Based on Phase-Only Correlation'', <i> IEICE Transactions on Fundamentals of Electronics, Communications and Computer Sciences </i> Vol. E86-A, pp. 1925-1934. (2003) 

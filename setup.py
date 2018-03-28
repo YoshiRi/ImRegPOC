@@ -21,7 +21,8 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3 :: Only',
     ],
-    packages=find_packages(), 
+#    packages=find_packages(), 
+    packages=['imregpoc'], 
     include_package_data=True,  
     keywords=['Image Registration', 'POC', 'FFT'], 
     license='BSD License', 
@@ -30,9 +31,5 @@ setup(
         'opencv-contrib-python',
         'numpy',
         'matplotlib',
-    ],
-    entry_points="""  # コマンドラインにするときのエントリーポイント、pitchpx/__init__.pyの関数をエントリーポイントにしました.
-        [console_scripts]
-        imregpoc = imregpoc:main
-    """,
+    ]   
 )
