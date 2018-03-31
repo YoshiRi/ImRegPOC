@@ -22,7 +22,7 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
     ],
 #    packages=find_packages(), 
-    packages=['imregpoc'], 
+    packages=['.'], 
     include_package_data=True,  
     keywords=['Image Registration', 'POC', 'FFT'], 
     license='BSD License', 

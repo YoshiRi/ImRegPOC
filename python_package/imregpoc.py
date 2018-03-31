@@ -210,7 +210,7 @@ class imregpoc:
         sDY = TY+DY
         sDX = TX+DX
         # Show the result
-        return [width/2-sDX,height/2-sDY],r[DY,DX],r
+        return [math.floor(width/2)-sDX,math.floor(height/2)-sDY],r[DY,DX],r
 
     def MoveCenter(self,Affine,center,newcenter):
         dx = newcenter[1] - center[1]
@@ -344,12 +344,17 @@ class TempMatcher:
             'SURF' : cv2.BFMatcher()
         }.get(name, 0)  
     
-    def match(self,img):
+    '''
+    Do matching based on the descriptor choosed in the constructor.
+    Input 1. Compared Image
+    Input 2. showflag for matched image
+    '''
+    def match(self,img,showflag=0):
         if len(img.shape) > 2: #if color then convert BGR to GRAY
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
              
         kp2,des2 = self.detector.detectAndCompute(img,None)
-        print(len(kp2))
+        print('Matched Points Number:'+str(len(kp2)))
         if len(kp2) < 5:
             return [0,0,0,1],0,0
             
@@ -377,7 +382,10 @@ class TempMatcher:
         if count > 4:
             self.H, self.mask = cv2.findHomography(pts1-self.center, pts2-self.center, cv2.RANSAC,3.0)
             self.inliner = np.count_nonzero(self.mask)
-
+        
+        if showflag:
+            img3 = cv2.drawMatchesKnn(self.template, self.kp1, img, kp2, good, None, flags=2)
+            plt.imshow(img3,cmap='gray')
         
         param = self.Getpoc()
         return param, count, self.inliner
@@ -430,6 +438,7 @@ class TempMatcher:
         plt.figure()
         plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
         plt.show()
+
 
 if __name__ == "__main__":
     # Read image

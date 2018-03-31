@@ -1,9 +1,8 @@
-README.md
+__init__.py
+imregpoc.py
 setup.py
 ImRegPOC.egg-info/PKG-INFO
 ImRegPOC.egg-info/SOURCES.txt
 ImRegPOC.egg-info/dependency_links.txt
 ImRegPOC.egg-info/requires.txt
 ImRegPOC.egg-info/top_level.txt
-imregpoc/__init__.py
-imregpoc/imregpoc.py
