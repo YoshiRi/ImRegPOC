@@ -352,7 +352,8 @@ class TempMatcher:
     def match(self,img,showflag=0):
         if len(img.shape) > 2: #if color then convert BGR to GRAY
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-             
+
+        self.cmp = img     
         kp2,des2 = self.detector.detectAndCompute(img,None)
         print('Matched Points Number:'+str(len(kp2)))
         if len(kp2) < 5:
@@ -387,10 +388,17 @@ class TempMatcher:
             img3 = cv2.drawMatchesKnn(self.template, self.kp1, img, kp2, good, None, flags=2)
             plt.imshow(img3,cmap='gray')
         
-        param = self.Getpoc()
+        param = self.getpoc()
         return param, count, self.inliner
-        
-    def Getpoc(self):
+
+    def getPerspective(self):
+        hei,wid = self.template.shape
+        cy,cx = hei/2,wid/2
+        Trans = np.float32([1,0,cx , 0,1,cy, 0,0,1]).reshape(3,3)
+        iTrans= np.float32([1,0,-cx , 0,1,-cy, 0,0,1]).reshape(3,3)
+        return np.dot(Trans,np.dot(self.H,iTrans))
+
+    def getpoc(self):
         h,w = self.template.shape
         #Affine = MoveCenterOfImage(self.H,[0,0],[w/2,h/2]) 
         Affine = self.H
@@ -422,9 +430,9 @@ class TempMatcher:
 
     def stitching(self,perspective=None):
         if perspective == None:
-            perspective = self.H
-        xmin,ymin,xmax,ymax = self.convertRectangle()
-        hei,wid = self.ref.shape
+            perspective = self.getPerspective()
+        xmin,ymin,xmax,ymax = self.convertRectangle(self.getPerspective())
+        hei,wid = self.template.shape
         sxmax = max(xmax,wid-1)
         sxmin = min(xmin,0)
         symax = max(ymax,hei-1)
@@ -434,7 +442,7 @@ class TempMatcher:
         Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
         newTrans = np.dot(Trans,np.linalg.inv(perspective))
         warpedimage = cv2.warpPerspective(self.cmp,newTrans,(swidth,sheight),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
-        warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.ref
+        warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.template        
         plt.figure()
         plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
         plt.show()

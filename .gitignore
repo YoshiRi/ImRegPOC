@@ -60,3 +60,4 @@ Temporary Items
 # Allow sample image
 !*ref.png
 !*cmp.png
+!ReadmeImage/*

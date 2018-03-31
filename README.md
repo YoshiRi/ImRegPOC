@@ -1,4 +1,3 @@
-# Under Construction
 
 # Robust FFT-Based Image Registration Tools for Python
 This program provides robust image registration method using "Phase Correlation" technique.
@@ -7,7 +6,7 @@ With this toolbox, you can estimate
 Translation, Rotation and Scaling between two images.
 
 Output form is supported: Affine Matrix, each parameter
-If you used this programs, please cite our paper below:
+If you used this programs, please cite our paper below ``( Now Under Construction Please Wait for a While )``:
 
 >  Y. Ri, H. Hiroshi Fujimoto. : \`\`Practical Phase-Only Correlation Algorithm for Robust and Accurate Image Sencing'', <i> Now Under Review </i> Vol. X, pp.XX. (20XX) 
 
@@ -39,27 +38,32 @@ pip install "ImRegPOC-1.0-py3-none-any.whl"
 
 ```
 
-# Demo
+# Test
 There are two classes included in this module.
 Both classes supports the image registration method.
 
 ## preparation
 
+Import modules and read monocular images. 
 ```python
 import cv2
 import numpy as np
 import imregpoc
+
+# read monocular image
+ref = cv2.imread('ref.png',0)
+cmp = cv2.imread('cmp.png',0)
+
 ```
+
+![](ReadmeImages/Images.png)
+
 ## Phase-Correlation
 Read monocular images and put two images to the `imregpoc` class.
 
 ```python
-# read monocular image
-temp = cv2.imread('ref.png',0)
-track = cv2.imread('cmp.png',0)
-
 # initialization
-result = imregpoc.imregpoc(temp,track)
+result = imregpoc.imregpoc(ref,cmp)
 ```
 
 You can get perspective transformation matrix with
@@ -78,15 +82,29 @@ or can get transformation parameters of [x traslation, y translation, rotation, 
 
 ```
 
-The good point of this method is 
+The merit of this method is that you can detect the success of this estimation via checking certain value.
+You can use isSucceed() function to check it. (0/1 to failure/succeed)
 
+```
+>>> result.isSucceed()
+1
+```
+
+
+Finally you can see stitched image based on the matching results.
+```
+>>> result.stitching()
+```
+
+![](ReadmeImages/MatchedImages.png)
 
 ## Feature points based template track 
 
-If you can use opencv-contrib package, this `Tempmacher` class also support feature points based matching.
+If you can use opencv-contrib package, this `TempMacher` class also support feature points based matching.
 You can use following descriptors.
 - SIFT
 - SURF
+- KAZE
 - AKAZE
 - ORB
 
@@ -94,18 +112,30 @@ Here is sample code.
 
 ```python
 # read monocular image
-temp = cv2.imread('ref.png',0)
-track = cv2.imread('cmp.png',0)
+ref = cv2.imread('ref.png',0)
+cmp = cv2.imread('cmp.png',0)
 
 # initialization (SIFT can be changed to other descriptor)
-matcher = imregpoc.TempMatcher(temp,'SIFT')
-matcher.match(track)
-# perspective transformation matrix (Homography matrix)
-print(matcher.H)
-# stitching two images based on the matching result
-match.stitching()
+matcher = imregpoc.TempMatcher(ref,'SIFT')
+
 ```
 
+match() function can do matching with the chosen descriptor.
+
+```python
+matcher.match(cmp,1) # you can ommit like matcher.match(cmp) to avoid show matched image
+```
+![](ReadmeImages/FPmatches.png)
+
+```python
+# perspective transformation matrix (Homography matrix)
+matcher.getPerspective()
+# stitching two images based on the matching result
+matcher.stitching()
+```
+![](ReadmeImages/MatchedImages.png)
+
+For further function, please see `./python_package/test.ipynb`.
 
 
 
