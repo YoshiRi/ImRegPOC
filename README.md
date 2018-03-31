@@ -26,25 +26,95 @@ For windows users, **anaconda** is one of the choise to install both of this.
 
 ```
 git clone https://github.com/YoshiRi/ImRegPOC
+cd python_package
 python setup.py install
 ```
 
-## Demos
+or using pip
 
-### Phase Correlation
+```
+git clone https://github.com/YoshiRi/ImRegPOC
+cd python_package/dist
+pip install "ImRegPOC-1.0-py3-none-any.whl"
 
-### Template Maching with Feature Points
+```
 
-### Image Stiching
+# Demo
+There are two classes included in this module.
+Both classes supports the image registration method.
+
+## preparation
+
+```python
+import cv2
+import numpy as np
+import imregpoc
+```
+## Phase-Correlation
+Read monocular images and put two images to the `imregpoc` class.
+
+```python
+# read monocular image
+temp = cv2.imread('ref.png',0)
+track = cv2.imread('cmp.png',0)
+
+# initialization
+result = imregpoc.imregpoc(temp,track)
+```
+
+You can get perspective transformation matrix with
+
+```
+>>> result.getPerspective()
+
+
+```
+
+or can get transformation parameters of [x traslation, y translation, rotation, scaling].
+
+```
+>>> result.getParam()
+
+
+```
+
+The good point of this method is 
+
+
+## Feature points based template track 
+
+If you can use opencv-contrib package, this `Tempmacher` class also support feature points based matching.
+You can use following descriptors.
+- SIFT
+- SURF
+- AKAZE
+- ORB
+
+Here is sample code.
+
+```python
+# read monocular image
+temp = cv2.imread('ref.png',0)
+track = cv2.imread('cmp.png',0)
+
+# initialization (SIFT can be changed to other descriptor)
+matcher = imregpoc.TempMatcher(temp,'SIFT')
+matcher.match(track)
+# perspective transformation matrix (Homography matrix)
+print(matcher.H)
+# stitching two images based on the matching result
+match.stitching()
+```
+
+
 
 
 # LICENSE
 BSD license
 
-## Citation
+## Author and Citation
 Currently please refer [following paper](http://hflab.k.u-tokyo.ac.jp/papers/2017/SAMCON2017_ri.pdf)
 :
 > Y. Ri and H. Fujimoto, “Image Based Visual Servo Application on Video Tracking with Monocular Camera Based on Phase Correlation Method,” The 3rd IEEJ international workshop on Sensing, Actuation, Motion Control, and Optimization, 2017.
 
-This paper will be updated sooner.
-
+For the further explanation about this package, please wait for a while for my newer paper.
