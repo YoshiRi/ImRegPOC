@@ -70,7 +70,9 @@ You can get perspective transformation matrix with
 
 ```
 >>> result.getPerspective()
-
+array([[  1.02470708,   0.25912559,  -6.2450943 ],
+       [ -0.25912559,   1.02470708,  67.10983276],
+       [  0.        ,   0.        ,   1.        ]], dtype=float32)
 
 ```
 
@@ -78,8 +80,10 @@ or can get transformation parameters of [x traslation, y translation, rotation, 
 
 ```
 >>> result.getParam()
-
-
+[18.989171526490182,
+ 41.011569264540483,
+ 0.24768527692501224,
+ 1.0569629070859445]
 ```
 
 The merit of this method is that you can detect the success of this estimation via checking certain value.
