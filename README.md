@@ -56,7 +56,7 @@ cmp = cv2.imread('cmp.png',0)
 
 ```
 
-![](https://github.com/YoshiRi/ImRegPOC/ReadmeImages/Images.png)
+![](ReadmeImages/Images.png)
 
 ## Phase-Correlation
 Read monocular images and put two images to the `imregpoc` class.
@@ -100,7 +100,7 @@ Finally you can see stitched image based on the matching results.
 >>> result.stitching()
 ```
 
-![](https://github.com/YoshiRi/ImRegPOC/ReadmeImages/MatchedImages.png)
+![](ReadmeImages/MatchedImages.png)
 
 ## Feature points based template track 
 
@@ -129,7 +129,7 @@ match() function can do matching with the chosen descriptor.
 ```python
 matcher.match(cmp,1) # you can ommit like matcher.match(cmp) to avoid show matched image
 ```
-![](https://github.com/YoshiRi/ImRegPOC/ReadmeImages/FPmatches.png)
+![](ReadmeImages/FPmatches.png)
 
 ```python
 # perspective transformation matrix (Homography matrix)
@@ -137,7 +137,7 @@ matcher.getPerspective()
 # stitching two images based on the matching result
 matcher.stitching()
 ```
-![](https://github.com/YoshiRi/ImRegPOC/ReadmeImages/MatchedImages.png)
+![](ReadmeImages/MatchedImages.png)
 
 For further function, please see `./python_package/test.ipynb`.
 
