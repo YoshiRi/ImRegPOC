@@ -142,12 +142,16 @@ matcher.stitching()
 For further function, please see `./python_package/test.ipynb`.
 
 
+# Data Sets
+The data sets to evaluate the Image registration results are available in [Google Drive](https://drive.google.com/drive/folders/1bs0N55Xe4KzFZBimSqyq8bSr1KwqwccW?usp=sharing).
+
+
 
 # LICENSE
 BSD license
 
-## Author and Citation
-Currently please refer [following paper](http://hflab.k.u-tokyo.ac.jp/papers/2017/SAMCON2017_ri.pdf)
+# Author and Citation
+Currently please refer the [following paper](http://hflab.k.u-tokyo.ac.jp/papers/2017/SAMCON2017_ri.pdf)
 :
 > Y. Ri and H. Fujimoto, “Image Based Visual Servo Application on Video Tracking with Monocular Camera Based on Phase Correlation Method,” The 3rd IEEJ international workshop on Sensing, Actuation, Motion Control, and Optimization, 2017.
 
