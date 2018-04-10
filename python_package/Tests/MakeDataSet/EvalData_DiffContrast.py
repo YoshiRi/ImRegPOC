@@ -260,6 +260,11 @@ def ChangeContrast(image,a):
   result_image = result_image.reshape(image.shape)
   return result_image
 
+def ChangeLight(image,a=1.2,b=15):
+  lut = [ max(0,min(255,(np.uint8( a*i+b )))) for i in range(256)] 
+  result_image = np.array( [ lut[value] for value in image.flat], dtype=np.uint8 )
+  result_image = result_image.reshape(image.shape)
+  return result_image
 
 
 def getDir():
@@ -420,7 +425,8 @@ if __name__ == '__main__':
 
     #-- Take a look at reference image
     refname = dirname + 'ref.png'
-    RefImg = ChangeContrast(cv2.imread(refname,0),15)
+    #RefImg = ChangeContrast(cv2.imread(refname,0),15)
+    RefImg = ChangeLight(cv2.imread(refname,0))
     cv2.imwrite(resdir+'contrast_ref.png',RefImg)
     cv2.imshow('Contrast',RefImg)
     cv2.waitKey(0)
