@@ -1,21 +1,17 @@
-% 2016/11/29  made by Yoshi Ri @ Univ.Tokyo
-% input image , rotation and scaling parameter and then output processed image
-% point: output must be the same image size with input
-% using bilinear interpolation
+function resizeimage = ImageRotateScale(Image,theta,scale,width,height)
 
+ cx = width/2;
+ cy = height/2;
+ cx = width/2 + 1/2;
+ cy = height/2 + 1/2;
 
-function resizedimage = ImageRotateScale(Image,theta,scale)
-% get size
-[height, width] = size(Image);
-cx = width/2;
-cy = height/2;
 ct = cosd(theta);
 st = sind(theta);
 
-% make matrix for output
-resizedimage = zeros(width,height);
+% tform = affine2d([cosd(theta) -sind(theta) 0; sind(theta) cosd(theta) 0; 0 0 1]);
 
-% do resize
+resizeimage = zeros(width,height);
+
 for i= 0:width-1
     for j= 0:height-1
         x=(ct*(i-cx)-st*(j-cy))*scale+cx;
@@ -29,9 +25,9 @@ for i= 0:width-1
             w1=x-x0;
             h0=y1-y;
             h1=y-y0;
-            %¬Å Bilinear interpolation
+            %Å@linearï‚äÆ
             val=Image(y0+1,x0+1)*w0*h0 + Image(y0+1,x1+1)*w1*h0+ Image(y1+1,x0+1)*w0*h1 + Image(y1+1,x1+1)*w1*h1;
-                resizedimage(j+1,i+1)=val;
+                resizeimage(j+1,i+1)=val;
             end
     end
 end
