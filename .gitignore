@@ -53,7 +53,7 @@ Temporary Items
 .apdisk
 
 # Excluding Test files
-python_package/Tests/*
+python_package/Tests/
 
 # images
 *.jpg
