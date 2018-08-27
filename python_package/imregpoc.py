@@ -450,8 +450,8 @@ class TempMatcher:
 
 if __name__ == "__main__":
     # Read image
-    ref = cv2.imread('../testref1.png',0)
-    cmp = cv2.imread('../testcmp1.png',0)
+    ref = cv2.imread('imgs/ref.png',0)
+    cmp = cv2.imread('imgs/cmp.png',0)
     plt.imshow(ref,cmap="gray")
 
     # reference parameter (you can change this)

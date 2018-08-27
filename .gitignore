@@ -52,6 +52,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Excluding Test files
+python_package/Tests/*
 
 # images
 *.jpg
