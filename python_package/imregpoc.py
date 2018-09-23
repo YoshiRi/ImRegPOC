@@ -500,10 +500,15 @@ if __name__ == "__main__":
     # reference parameter (you can change this)
     match = imregpoc(ref,cmp)
     print(match.peak,match.param)
-    match_new = imregpoc(ref,cmp,fitting='Parabola')
-    print(match.peak,match.param)
+    match_para = imregpoc(ref,cmp,fitting='Parabola')
+    print(match_para.peak,match_para.param)
+    match_cog = imregpoc(ref,cmp,fitting='COG')
+    print(match_cog.peak,match_cog.param)
 
     match.stitching()
+    match_para.stitching()
+    match_cog.stitching()
+    
     center = np.array(ref.shape)/2
     persp = match.poc2warp(center,[-5.40E+01,-2.00E+00,9.72E+01/180*math.pi,6.03E-01])
     match.stitching(persp)
