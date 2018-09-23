@@ -18,13 +18,14 @@ import matplotlib.pyplot as plt # matplotlibの描画系
 import math
 
 class imregpoc:
-    def __init__(self,iref,icmp,*,threshold = 0.06, alpha=0.5, beta=0.8):
+    def __init__(self,iref,icmp,*,threshold = 0.06, alpha=0.5, beta=0.8, fitting = 'WeightedCOG'):
         self.ref = iref.astype(np.float32)
         self.cmp = icmp.astype(np.float32)
         self.th = threshold
         self.center = np.array(iref.shape)/2.0
         self.alpha = alpha
         self.beta = beta
+        self.fitting = fitting
 
         self.param = [0,0,0,1]
         self.peak = 0
@@ -162,6 +163,19 @@ class imregpoc:
         outImg = cv2.warpPerspective(Img, Affine, (cols,rows), cv2.INTER_LINEAR)
         return outImg
 
+    def SubpixFitting(self,mat):
+        if self.fitting == 'COG':
+            TY,TX = self.CenterOfGravity(mat)
+        elif self.fitting == 'WeightedCOG':
+            TY,TX = self.WeightedCOG(mat)
+        elif self.fitting == 'Parabola':
+            TY,TX = self.Parabola(mat)
+        else:
+            print("Undefined subpixel fitting method! Use weighted center of gravity method instead.")
+            TY,TX = self.WeightedCOG(mat)
+
+        return [TY,TX]
+
     # Get peak point
     def CenterOfGravity(self,mat):
         hei,wid = mat.shape
@@ -187,6 +201,34 @@ class imregpoc:
             Res = self.CenterOfGravity(newmat)
         return Res
 
+    # Parabola subpixel fitting
+    def Parabola(self,mat):
+        hei,wid = mat.shape
+        boxsize = 3
+        cy = int((hei-1)/2)
+        cx = int((wid-1)/2)
+        bs = int((boxsize-1)/2)
+        box = mat[cy-bs:cy-bs+boxsize,cx-bs:cx-bs+boxsize]
+        # [x^2 y ^2 x y 1]
+        Tile = np.arange(boxsize,dtype=float)-bs
+        Tx = np.tile(Tile,[boxsize,1])
+        Ty = Tx.T
+        Ones = np.ones((boxsize*boxsize,1),dtype=float)
+        x = Tx.reshape(boxsize*boxsize,1)
+        y = Ty.reshape(boxsize*boxsize,1)
+        x2 = x*x
+        y2 = y*y
+        A = np.concatenate((x2,y2,x,y,Ones),1)
+        # data = A^+ B
+        data = np.dot(np.linalg.pinv(A) , box.reshape(boxsize*boxsize,1))
+        # xmax = -c/2a, ymax = -d/2b, peak = e - c^2/4a - d^2/4b
+        a,b,c,d,e = data.squeeze()
+        Ay = -d /2.0/b
+        Ax = -c /2.0/a
+        self.peak = e - c*c/4.0/a - d*d/4.0/b
+        return [Ay,Ax]
+
+
     # Phase Correlation
     def PhaseCorrelation(self, a, b):
         height,width = a.shape
@@ -205,12 +247,13 @@ class imregpoc:
         # Subpixel Accuracy
         boxsize = 5
         box = r[DY-int((boxsize-1)/2):DY+int((boxsize-1)/2)+1,DX-int((boxsize-1)/2):DX+int((boxsize-1)/2)+1] # x times x box
-        #TY,TX= CenterOfGravity(box)
-        TY,TX= self.WeightedCOG(box)
+        # subpix fitting
+        self.peak = r[DY,DX]
+        TY,TX= self.SubpixFitting(box)
         sDY = TY+DY
         sDX = TX+DX
         # Show the result
-        return [math.floor(width/2)-sDX,math.floor(height/2)-sDY],r[DY,DX],r
+        return [math.floor(width/2)-sDX,math.floor(height/2)-sDY],self.peak,r
 
     def MoveCenter(self,Affine,center,newcenter):
         dx = newcenter[1] - center[1]
@@ -457,7 +500,7 @@ if __name__ == "__main__":
     # reference parameter (you can change this)
     match = imregpoc(ref,cmp)
     print(match.peak,match.param)
-    match_new = imregpoc(ref,cmp)
+    match_new = imregpoc(ref,cmp,fitting='Parabola')
     print(match.peak,match.param)
 
     match.stitching()
