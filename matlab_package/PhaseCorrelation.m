@@ -2,7 +2,7 @@
 %% output: translational displacement [dx,dy] and correlation peaks
 
 %% main phase correlation function
-function [dx,dy,peak] = PhaseCorrelation(AI,BI,subpixel,window)
+function [dx,dy,peak,Pt] = PhaseCorrelation(AI,BI,subpixel,window)
 
 % check input numbers
 if nargin < 2
@@ -38,11 +38,11 @@ Pt = fftshift(ifft2(At.*Bt));
 dx=x;
 dy=y(x); 
 
-[pxx,pyy,peak] = subpixfitting(Pt,dx,dy,subpixel);
+[pxx,pyy,peak] = subpixfitting2(Pt,dx,dy,subpixel);
 
 % get translation from center
-dx = floor(width/2) - pxx1 + 1;
-dy = floor(height/2 )- pyy1 + 1;
+dx = floor(width/2) - pxx + 1;
+dy = floor(height/2 )- pyy + 1;
 
 
 end
@@ -51,6 +51,9 @@ end
 function win = windowing(width,height,method)
 
 %% Create window
+ cy = height/2;
+ cx = floor(width/2);
+
 % hannig window and root of hanning window
 han_win = zeros(width);
 Rhan_win = zeros(width);
@@ -96,8 +99,16 @@ end
 %% interpolation
 function [sdx,sdy,peak] = subpixfitting(Pt,dx,dy,method)
 
+
 % subpixel matching
 box = Pt(dy-1:dy+1,dx-1:dx+1);
+
+% making weight function
+center_weight = 10;
+wvec = ones(9,1);
+wvec(5)=center_weight;
+W = diag([wvec]);
+W = diag([reshape(box,9,1)]);
 
 % parabola for 3 
 Tx = repmat([-1 0 1],3,1);
@@ -108,10 +119,53 @@ x2 = x.*x;
 y2 = y.*y;
 One = ones(9,1);
 
-p = [x2,y2,x,y,One]\reshape(box,9,1);
+A = [x2,y2,x,y,One];
+p = (A'*W*A)\A'*W*reshape(box,9,1);
 
-sdy = -p(4) /2.0/p(2);
-sdx = -p(3) /2.0/p(1);
+sdy = dy -p(4) /2.0/p(2);
+sdx = dx -p(3) /2.0/p(1);
 peak = p(5) - p(3)*p(3)/4.0/p(1) - p(4)*p(4)/4.0/p(2);
 
+z = p(1)*x.^2+p(2)*y.^2+p(3)*x+p(4)*y+p(5);
+
+figure(111)
+plot3(x,y,reshape(box,9,1),'*',x,y,z,'o')
+legend('Raw data','Palabora fitted')
+end
+
+function [sdx,sdy,peak] = subpixfitting2(Pt,dx,dy,method)
+
+
+% subpixel matching
+box = Pt(dy-1:dy+1,dx-1:dx+1);
+
+% making weight function
+center_weight = 10;
+wvec = ones(9,1);
+wvec(5)=center_weight;
+W = diag([wvec]);
+W = diag([reshape(abs(box),9,1)]);
+
+% parabola for 3 
+Tx = repmat([-1 0 1],3,1);
+Ty = Tx.';
+x = reshape(Tx,9,1);
+y = reshape(Ty,9,1);
+x2 = x.*x;
+y2 = y.*y;
+One = ones(9,1);
+
+A = [x2+y2,x,y,One];
+p = (A'*W*A)\A'*W*reshape(box,9,1);
+
+sdy = dy -p(3) /2.0/p(1);
+sdx = dx -p(2) /2.0/p(1);
+peak = p(4) - p(2)*p(2)/4.0/p(1) - p(3)*p(3)/4.0/p(1);
+
+z = p(1)*x.^2+p(1)*y.^2+p(2)*x+p(3)*y+p(4);
+
+figure(111)
+plot3(x,y,reshape(box,9,1),'*',x,y,z,'o')
+legend('Raw data','Palabora fitted')
+grid on
 end

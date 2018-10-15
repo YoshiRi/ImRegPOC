@@ -2,8 +2,8 @@
 % you need Image Processing toolbox for MATLAB
 
 %% read images with gray scale
-ref = imread('../python_package/ref.png');
-cmp = imread('../python_package/cmp.png');
+ref = imread('../python_package/imgs/ref.png');
+cmp = imread('../python_package/imgs/cmp.png');
 
 % if it is not grayscale
 if ndims(ref)>2
@@ -15,3 +15,4 @@ end
 
 %% put in poc function
 poc_prototype(ref,cmp)
+
