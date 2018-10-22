@@ -37,7 +37,7 @@ class imregpoc:
         
     def match(self):
         height,width = self.ref.shape
-        self.hanw = cv2.createHanningWindow((height, width),cv2.CV_64F)
+        self.hanw = cv2.createHanningWindow((width, height),cv2.CV_64F)
 
         # Windowing and FFT
         G_a = np.fft.fft2(self.ref*self.hanw)
