@@ -6,9 +6,7 @@ With this toolbox, you can estimate
 Translation, Rotation and Scaling between two images.
 
 Output form is supported: Affine Matrix, each parameter
-If you used this programs, please cite our paper below ``( Now Under Construction Please Wait for a While )``:
 
->  Y. Ri, H. Hiroshi Fujimoto. : \`\`Practical Phase-Only Correlation Algorithm for Robust and Accurate Image Sencing'', <i> Now Under Review </i> Vol. X, pp.XX. (20XX) 
 
 # Getting started 
 ## Requirements
@@ -151,8 +149,17 @@ The data sets to evaluate the Image registration results are available in [Googl
 BSD license
 
 # Author and Citation
-Currently please refer the [following paper](http://hflab.k.u-tokyo.ac.jp/papers/2017/SAMCON2017_ri.pdf)
+
+If you used this programs, please cite our paper.
+
+For Japanese, please refer [this paper](https://drive.google.com/file/d/1HFh4rFWPOQWkaYmJry2nGcLSny2iELAg/view?usp=sharing).
+> 李 尭希，藤本 博志：「FFT に基づくロバストな画像のレジストレーション手法の設計」電学論D,Vol.139, No.X,pp.XX (2019)
+
+Or [this paper](https://drive.google.com/file/d/1Egfa0hAuXTdcNXWH35yvnrEF-1h8E-1D/view?usp=sharing).
+
+> Y. Ri and H. Fujimoto, “Drift-free Motion Estimation from Video Images using Phase Correlation and Linear Optimization,” in The 15th International Workshop on Advanced Motion Control, 2018, p. N/A.
+
+Another [Related paper](http://hflab.k.u-tokyo.ac.jp/papers/2017/SAMCON2017_ri.pdf) is here
 :
 > Y. Ri and H. Fujimoto, “Image Based Visual Servo Application on Video Tracking with Monocular Camera Based on Phase Correlation Method,” The 3rd IEEJ international workshop on Sensing, Actuation, Motion Control, and Optimization, 2017.
-
-For the further explanation about this package, please wait for a while for my newer paper.
+[1] 
