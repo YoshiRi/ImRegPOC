@@ -7,6 +7,9 @@ Translation, Rotation and Scaling between two images.
 
 Output form is supported: Affine Matrix, each parameter
 
+Here is image mosaicing result with this tool.
+
+![](ReadmeImages\ImregPOC.png)
 
 # Getting started 
 ## Requirements
