@@ -155,8 +155,8 @@ BSD license
 
 If you used this programs, please cite our paper.
 
-For Japanese, please refer [this paper](https://drive.google.com/file/d/1HFh4rFWPOQWkaYmJry2nGcLSny2iELAg/view?usp=sharing).
-> 李 尭希，藤本 博志：「FFT に基づくロバストな画像のレジストレーション手法の設計」電学論D,Vol.139, No.X,pp.XX (2019)
+For Japanese, please refer [this paper](https://drive.google.com/file/d/1bfWkzp_VSiMoQKSBTKt0xPKYoKyuCz4A/view?usp=sharing).
+> 李 尭希, 藤本博志, ``FFT に基づくロバストな画像のレジストレーション手法の設計’’,電気学会論文誌D, Vol. 139, No. 1, pp.22-29, 2019
 
 Or [this paper](https://drive.google.com/file/d/1Egfa0hAuXTdcNXWH35yvnrEF-1h8E-1D/view?usp=sharing).
 
