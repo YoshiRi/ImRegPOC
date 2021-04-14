@@ -13,13 +13,13 @@ Here is image mosaicing result with this tool.
 
 # Getting started 
 ## Requirements
-- Python3.X (3.5 is recommended)
+- Python3.X (Confirmed with 3.9 on Miniforge on M1 Mac)
 - opencv-python
 - opencv-contrib-python
 - numpy
 - matplotlib
 
-Recommend opencv version is 3.X.
+This branch is for the opencv 4.X.
 For windows users, **anaconda** is one of the choise to install both of this.
 
 ## Install
