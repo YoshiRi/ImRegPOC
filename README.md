@@ -13,16 +13,32 @@ Here is image mosaicing result with this tool.
 
 # Getting started 
 ## Requirements
-- Python3.X (Confirmed with 3.9 on Miniforge on M1 Mac)
-- opencv-python
-- opencv-contrib-python
-- numpy
-- matplotlib
+- `master branch`
+  - Python3.X (Confirmed with 3.5 with Anaconda on Windows10)
+  - opencv-python (opencv v.3.4)
+  - opencv-contrib-python
+  - numpy
+  - matplotlib
+- `version/4.5.1 branch`
+  - Python3.X (Confirmed with 3.9 on Miniforge on M1 Mac)
+  - opencv-python (opencv v.4.1)
+  - opencv-contrib-python
+  - numpy
+  - matplotlib
 
-This branch is for the opencv 4.X.
+
+This branch is for the opencv 3.X.
 For windows users, **anaconda** is one of the choise to install both of this.
 
-## Install
+## Installation
+
+Put `imregpoc.py` to your working directory and just import it.
+
+```py
+import imregpoc
+```
+
+or use setup.py shown below.
 
 ```
 git clone https://github.com/YoshiRi/ImRegPOC
