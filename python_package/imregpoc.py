@@ -19,10 +19,10 @@ import math
 
 class imregpoc:
     def __init__(self,iref,icmp,*,threshold = 0.06, alpha=0.5, beta=0.8, fitting = 'WeightedCOG'):
-        self.ref = iref.astype(np.float32)
-        self.cmp = icmp.astype(np.float32)
+        self.orig_ref = iref.astype(np.float32)
+        self.orig_cmp = icmp.astype(np.float32)
         self.th = threshold
-        self.center = np.array(iref.shape)/2.0
+        self.orig_center = np.array(self.orig_ref.shape)/2.0
         self.alpha = alpha
         self.beta = beta
         self.fitting = fitting
@@ -32,9 +32,35 @@ class imregpoc:
         self.affine = np.float32([1,0,0,0,1,0]).reshape(2,3)
         self.perspective = np.float32([1,0,0,0,1,0,0,0,0]).reshape(3,3)
 
+        # set ref, cmp, center
+        self.fft_padding()
         self.match()
 
-        
+
+    def define_fftsize(self):
+        refshape = self.orig_ref.shape
+        cmpshape = self.orig_cmp.shape
+        if not refshape == cmpshape:
+            print("The size of two input images are not equal! Estimation could be inaccurate.")
+        maxsize = max(max(refshape),max(cmpshape))
+        # we can use faster fft window size with scipy.fftpack.next_fast_len
+        return maxsize
+
+    def padding_image(self,img,imsize):
+        pad_img = np.pad(img,[(0,imsize[0]-img.shape[0]),(0,imsize[1]-img.shape[1])],'constant')
+        return pad_img
+
+    def fft_padding(self):
+        maxsize = self.define_fftsize()
+        self.ref = self.padding_image(self.orig_ref,[maxsize,maxsize])
+        self.cmp = self.padding_image(self.orig_cmp,[maxsize,maxsize])
+        self.center = np.array(self.ref.shape)/2.0
+
+    def fix_params(self):
+        # If you padded to right and lower, perspective is the same with original image 
+        self.param = self.warp2poc(perspective = self.perspective, center = self.orig_center)
+
+
     def match(self):
         height,width = self.ref.shape
         self.hanw = cv2.createHanningWindow((width, height),cv2.CV_64F)
@@ -96,9 +122,11 @@ class imregpoc:
         self.peak = peak
         self.perspective = self.poc2warp(self.center,self.param)
         self.affine = self.perspective[0:2,:]
+        self.fix_params()
 
     def match_new(self, newImg):
-        self.cmp = newImg
+        self.cmp_orig = newImg
+        self.fft_padding()
         height,width = self.cmp.shape
         cy,cx = height/2,width/2
         G_b = np.fft.fft2(self.cmp*self.hanw)
@@ -138,7 +166,9 @@ class imregpoc:
         self.param = [Trans[0],Trans[1],theta,1/invscale]
         self.peak = peak
         self.perspective = self.poc2warp(self.center,self.param)
-        self.affine = self.perspective[0:2,:]        
+        self.affine = self.perspective[0:2,:] 
+        self.fix_params()
+       
         
     def poc2warp(self,center,param):
         cx,cy = center
@@ -154,6 +184,16 @@ class imregpoc:
         Affine = np.dot(cRot,Trans)
         return Affine
 
+    def warp2poc(self,center,perspective):
+        cx,cy = center
+        Center = np.float32([[1,0,cx],[0,1,cy],[0,0,1]])
+        iCenter = np.float32([[1,0,-cx],[0,1,-cy],[0,0,1]])
+
+        pocmatrix = np.dot(np.dot(iCenter,perspective),Center)
+        dxy = np.dot(np.linalg.inv(pocmatrix[0:2,0:2]),pocmatrix[0:2,2])
+        scale = np.sqrt(pocmatrix[0,0]**2+pocmatrix[0,1]**2) 
+        theta = np.arctan2(pocmatrix[0,1],pocmatrix[0,0])
+        return [dxy[0],dxy[1],theta,scale]
 
     # Waro Image based on poc parameter
     def Warp_4dof(self,Img,param):
@@ -312,7 +352,7 @@ class imregpoc:
     def convertRectangle(self,perspective=None):
         if perspective == None:
             perspective = self.perspective
-        height,width = self.cmp.shape
+        height,width = self.orig_cmp.shape
         rectangles = np.float32([[0,0, 0,width-1, height-1,0, height-1,width-1]]).reshape(1,4,2)
         converted_rectangle = cv2.perspectiveTransform(rectangles,np.linalg.inv(perspective))
         xmax = math.ceil(converted_rectangle[0,:,0].max())
@@ -325,7 +365,7 @@ class imregpoc:
         if perspective == None:
             perspective = self.perspective
         xmin,ymin,xmax,ymax = self.convertRectangle()
-        hei,wid = self.ref.shape
+        hei,wid = self.orig_ref.shape
         sxmax = max(xmax,wid-1)
         sxmin = min(xmin,0)
         symax = max(ymax,hei-1)
@@ -334,8 +374,8 @@ class imregpoc:
         xtrans,ytrans = 0-sxmin,0-symin
         Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
         newTrans = np.dot(Trans,np.linalg.inv(perspective))
-        warpedimage = cv2.warpPerspective(self.cmp,newTrans,(swidth,sheight),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
-        warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.ref
+        warpedimage = cv2.warpPerspective(self.orig_cmp,newTrans,(swidth,sheight),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        warpedimage[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.orig_ref
         plt.figure()
         plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
         plt.show()
