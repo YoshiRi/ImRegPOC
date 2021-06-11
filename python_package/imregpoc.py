@@ -380,6 +380,31 @@ class imregpoc:
         plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
         plt.show()
 
+    def showCorrection(self,perspective=None):
+        if perspective is None:
+            perspective = self.perspective
+        xmin,ymin,xmax,ymax = self.convertRectangle()
+        hei,wid = self.orig_ref.shape
+        sxmax = max(xmax,wid-1)
+        sxmin = min(xmin,0)
+        symax = max(ymax,hei-1)
+        symin = min(ymin,0)
+        swidth,sheight = sxmax-sxmin+1,symax-symin+1
+        xtrans,ytrans = 0-sxmin,0-symin
+        Trans = np.float32([1,0,xtrans , 0,1,ytrans, 0,0,1]).reshape(3,3)
+        newTrans = np.dot(Trans,np.linalg.inv(perspective))
+        warpedimage = cv2.warpPerspective(self.orig_cmp,newTrans,(swidth,sheight),flags=cv2.INTER_LINEAR+cv2.WARP_FILL_OUTLIERS)
+        orig = warpedimage.copy()
+        orig[:] = 0
+        orig[ytrans:ytrans+hei,xtrans:xtrans+wid] = self.orig_ref
+        plt.figure()
+        plt.subplot(1,2,1)
+        plt.imshow(orig,vmin=orig.min(),vmax=orig.max(),cmap='gray')
+        plt.subplot(1,2,2)
+        plt.imshow(warpedimage,vmin=warpedimage.min(),vmax=warpedimage.max(),cmap='gray')
+        plt.show()
+
+
 class TempMatcher:
 
     def __init__(self,temp,descriptor = 'ORB'):
